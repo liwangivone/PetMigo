@@ -1,6 +1,6 @@
 # ADR 01
 # Title: App Architecture Pattern
-*Status: Accepted*
+# Status: Accepted
 
 ## Context
 Penentuan App Architecture Pattern dibutuhkan untuk memudahkan pengembangan Aplikasi kedepannya
@@ -16,6 +16,10 @@ Tim kami juga mempertimbangan pengembangan Aplikasi kami menggunakan MVVM dikare
 
 
 ## Consequences
-- Good : Pemisahan logika bisnis dan antarmuka pengguna meningkatkan modularitas, memungkinkan pengembangan parallel antara tim front-end dan back-end, dan memudahkan pengujian unit karena masing-masing komponen dapat diuji secara terpisah.
+- Good : 
 
-- Bad : Untuk aplikasi kecil, penggunaan MVC bisa terasa terlalu kompleks dan koordinasi antara ketiga komponen memerlukan arsitektur yang disiplin dan perancangan serta penulisan kode bisa menjadi lebih panjang dan membutuhkan banyak boilerplate.
+    Pemisahan logika bisnis dan antarmuka pengguna meningkatkan modularitas, memungkinkan pengembangan parallel antara tim front-end dan back-end, dan memudahkan pengujian unit karena masing-masing komponen dapat diuji secara terpisah.
+##
+- Bad : 
+
+    Untuk aplikasi kecil, penggunaan MVC bisa terasa terlalu kompleks dan koordinasi antara ketiga komponen memerlukan arsitektur yang disiplin dan perancangan serta penulisan kode bisa menjadi lebih panjang dan membutuhkan banyak boilerplate.

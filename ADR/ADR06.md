@@ -1,12 +1,11 @@
-ADR 06
+# ADR 06
+# Title: Navigation & Routing Solution
+# Status:
 
-Title: Navigation & Routing Solution
-Status:
+## Context
 
-Context:
+## Decision
 
-Decision:
+## Alternatives
 
-Alternatives:
-
-Consequences:
+## Consequences
