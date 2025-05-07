@@ -1,0 +1,16 @@
+# Architecture Decision Log (ADL) – PetMigo
+
+Berikut adalah daftar keputusan arsitektur yang digunakan dalam pengembangan aplikasi PetMigo:
+
+| No |           Decision Topic           |  Status   |    Date     |                    Link                      |
+|----|------------------------------------|-----------|-------------|----------------------------------------------|
+| 01 | App Architecture Pattern           | Accepted  | 2024-05-10  | [app_architecture_pattern](ADR01.md)         |
+| 02 | State Management Approach          | Accepted  | 2024-05-10  | [state_management_approach](ADR02.md)        |
+| 03 | Backend Integration Strategy       | Accepted  | 2024-05-10  | [backend_integration_strategy](ADR03.md)     |
+| 04 | Local Data Persistence             | Accepted  | 2024-05-10  | [local_data_persistence](ADR04.md)           |
+| 05 | Dependency Injection               | Accepted  | 2024-05-10  | [dependency_injection](ADR05.md)             |
+| 06 | Navigation & Routing               | Accepted  | 2024-05-10  | [navigation_routing](ADR06.md)               |
+| 07 | Theming & UI Styling               | Accepted  | 2024-05-10  | [theming_ui](ADR07.md)                       |
+| 08 | Online Support & Caching           | Accepted  | 2024-05-10  | [online_support_caching](ADR08.md)           |
+| 09 | Error Handling & Monitoring        | Accepted  | 2024-05-10  | [error_handling_monitoring](ADR09.md)        |
+| 10 | Testing Strategy & CI/CD Pipeline  | Accepted  | 2024-05-10  | [testing_strategy_pipeline](ADR010.md)       |
