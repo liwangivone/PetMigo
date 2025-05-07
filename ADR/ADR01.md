@@ -3,16 +3,16 @@
 # Status: Accepted
 
 ## Context
-Penentuan App Architecture Pattern dibutuhkan untuk memudahkan pengembangan Aplikasi kedepannya
+Penentuan App Architecture Pattern dibutuhkan untuk memudahkan pengembangan dan mmaintanance Aplikasi kedepannya.
 
 ## Decision
-Dalam pengembangan aplikasi PetMigo, selama pola arsitektur yang digunakan adalah Model-View-Controller (MVC). Pemilihan pattern ini didasarkan pada kebutuhan untuk memisahkan logika bisnis, antarmuka pengguna, dan manajemen data agar aplikasi lebih mudah dikelola dan dikembangkan secara modular.
+Dalam pengembangan aplikasi PetMigo, pola arsitektur yang digunakan adalah Model-View-Controller (MVC). Pemilihan pola ini didasarkan pada kebutuhan untuk memisahkan logika bisnis, antarmuka pengguna, dan manajemen data agar aplikasi lebih mudah dikelola dan dikembangkan secara modular.
 
-Tim kami memilih MVC karena dengan arsitektur MVC, setiap bagian sistem dapat dikembangkan dan diuji secara terpisah. Misalnya, saat melakukan pembaruan pada tampilan fitur My Expenses, pengembang tidak perlu mengubah komponen logika bisnis atau data. Hal ini sangat efisien terutama jika pengembangan dilakukan oleh tim berbeda untuk front-end dan back-end.
+Tim kami memilih MVC karena selain seluruh anggota tim sudah sangat familiar dengan arsitektur MVC, setiap bagian sistem nantinya dapat dikembangkan dan diuji secara terpisah. Misalnya, saat melakukan pembaruan pada tampilan fitur My Expenses, kami tidak perlu mengubah komponen logika bisnis atau data. Hal ini sangat efisien terutama jika pengembangan dilakukan oleh tim berbeda untuk front-end dan back-end. 
 
 
 ## Alternatives
-Tim kami juga mempertimbangan pengembangan Aplikasi kami menggunakan MVVM dikarenakan kecocokan dengan flutter, akan tetapi tim kami kurang familiar dengan penggunaan MVVM.
+Tim kami juga mempertimbangkan pengembangan Aplikasi kami menggunakan MVVM dikarenakan kecocokan dengan flutter, akan tetapi tim kami kurang familiar dengan penggunaan MVVM. Oleh karena itu kemungkinan besar alternatif ini tidak akan kami gunakan.
 
 
 ## Consequences

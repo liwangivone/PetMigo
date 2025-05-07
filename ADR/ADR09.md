@@ -1,6 +1,6 @@
 # ADR 09
 # Title: Error Handling & Monitoring
-# Status: Accepted
+# Status: Proposed
 
 ## Context
 Tim Kami memutuskan untuk membuat error handling sendiri tanpa bantuan dependency atau sesuatu yang mirip. Keputusan ini diambil untuk memberikan fleksibilitas dan kendali penuh atas implementasi error handling, tanpa bergantung pada library eksternal.

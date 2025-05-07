@@ -3,23 +3,18 @@
 # Status: Accepted
 
 ## Context
-Aplikasi Kami membutuhkan Framework yang akan digunakan sebagai backend dari aplikasi.
+Aplikasi perlu terhubung dengan back-end untuk mengakses seluruh data yang diperlukan dalam aplikasi ini, seperti data pengguna, hewan, pengeluaran pengguna, dan chat.
 
 ## Decision
-Dalam pengembangan sistem backend pada proyek ini, tim dihadapkan pada beberapa pilihan framework yang dapat mendukung skalabilitas, performa, serta kemudahan integrasi dengan layanan lain. Dua opsi utama yang dipertimbangkan adalah Spring Boot (Java) dan Laravel (PHP). Kedua framework ini memiliki ekosistem yang matang dan dokumentasi yang baik, namun karakteristik dan kebutuhan proyek mendorong tim untuk melakukan seleksi berdasarkan kriteria teknis dan strategis.
-
-Keputusan ini kami ambil berdasarkan beberapa faktor seperti kompatibilitas tim kami, Skalabilitas dan performa, serta dukungan Komunitas dan Ekosistem yang Kuat. Tim kami juga mempertimbangkan pengembangan dan keamanan dalam menentukan Framework backend yang akan digunakan.
+Dalam pengembangan back-end ini, tim menggunakan RESTful API berbasis HTTP yang dibuat dengan menggunakan framework Spring Boot.
 
 ## Alternatives
-Tim kami memutuskan untuk tidak menggunakan Laravel sebagai framework utama dalam pengembangan proyek ini karena beberapa pertimbangan strategis. Salah satu alasan utamanya adalah kebutuhan akan performa yang lebih ringan serta fleksibilitas dalam struktur proyek, yang saat ini lebih sesuai dipenuhi oleh framework utama yang kami gunakan, yaitu Spring Boot.
-
-Meskipun demikian, Laravel tetap kami pertimbangkan sebagai alternatif cadangan. Apabila di kemudian hari ditemukan kendala signifikan dalam penggunaan Spring Boot baik dari segi keterbatasan fitur, waktu pengembangan, atau kompleksitas implementasi maka tidak menutup kemungkinan bahwa Laravel akan dipertimbangkan kembali sebagai solusi pengganti, terutama mengingat ekosistemnya yang matang dan kemudahan dalam membangun aplikasi web secara cepat.
+-
 
 ## Consequences
 - Good : 
 
-    Bagus dalam pembuatan dari awal dan tidak memusingkan akibat banyaknya fitur yang sudah jadi seperti laravel yang sudah lumayan kompleks
-##
-- Bad : 
+    1. Tim sudah cukup familiar dengan penggunaan RESTful API.
+    2. Terdapat dokumentasi yang luas dan mudah didapatkan.
+    3. Pembuatan dokumentasi API cukup mudah karena dapat dihubungkan dengan tool Swagger.
 
-    Membuat dari awal seperti password encrypt, user model dll
