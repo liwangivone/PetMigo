@@ -64,9 +64,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Status bar with time and icons
-            _buildStatusBar(),
-            
             // Page view for onboarding content
             Expanded(
               child: PageView.builder(
@@ -96,29 +93,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildStatusBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            '18:10',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          Row(
-            children: [
-              const Icon(Icons.signal_cellular_4_bar, size: 16),
-              const SizedBox(width: 4),
-              const Icon(Icons.wifi, size: 16),
-              const SizedBox(width: 4),
-              Icon(Icons.battery_full, size: 16),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+  // Status bar custom telah dihapus
 
   Widget _buildOnboardingPage(OnboardingData data) {
     return Padding(
