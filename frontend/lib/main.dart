@@ -69,18 +69,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
-
-class onboarding_pages extends StatefulWidget {
-  const onboarding_pages({super.key});
-
-  @override
-  State<onboarding_pages> createState() => _onboarding_pagesState();
-}
-
-class _onboarding_pagesState extends State<onboarding_pages> {
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
-  }
-}
