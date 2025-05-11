@@ -85,7 +85,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     // Banner biru yang sekarang mentok ke atas
                     Container(
                       width: double.infinity,
-                      height: MediaQuery.of(context).size.height * 0.58,
+                      height: MediaQuery.of(context).size.height * 0.62,
                       decoration: const BoxDecoration(
                         color: Color(0xFFDCF0FF),
                         borderRadius: BorderRadius.only(
