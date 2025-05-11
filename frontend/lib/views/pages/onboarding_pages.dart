@@ -57,7 +57,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Menghilangkan app bar untuk menghapus status bar
+      // Tetap gunakan extendBodyBehindAppBar untuk status bar transparan
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -69,115 +69,116 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         ),
       ),
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() => _currentPage = index);
-                },
-                itemCount: onboardingData.length,
-                itemBuilder: (context, index) {
-                  final data = onboardingData[index];
-                  return Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Image area with light blue background
-                       Container(
-                          width: double.infinity,
-                          height: MediaQuery.of(context).size.height * 0.45,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFDCF0FF),
-                            borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(160),
-                              bottomRight: Radius.circular(160),
+      body: Column(
+        children: [
+          Expanded(
+            child: PageView.builder(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() => _currentPage = index);
+              },
+              itemCount: onboardingData.length,
+              itemBuilder: (context, index) {
+                final data = onboardingData[index];
+                return Column(
+                  children: [
+                    // Banner biru yang sekarang mentok ke atas
+                    Container(
+                      width: double.infinity,
+                      height: MediaQuery.of(context).size.height * 0.58,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFDCF0FF),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(160),
+                          bottomRight: Radius.circular(160),
+                        ),
+                      ),
+                      child: Center(
+                        child: Image.asset(
+                          data['image']!,
+                          height: 260,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 40),
+                          // Title
+                          Text(
+                            data['title']!,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          // Description
+                          Text(
+                            data['description']!,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black54,
                             ),
                           ),
-                          child: Center(
-                            child: Image.asset(
-                              data['image']!,
-                              height: 200,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 40),
-                        // Title
-                        Text(
-                          data['title']!,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        // Description
-                        Text(
-                          data['description']!,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.black54,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  );
-                },
-              ),
+                  ],
+                );
+              },
             ),
-            // Indicator dots
-            Padding(
-              padding: const EdgeInsets.only(bottom: 24.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  onboardingData.length,
-                  (index) => Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    height: 8,
-                    width: 8,
-                    decoration: BoxDecoration(
-                      color: _currentPage == index 
-                          ? const Color(0xFFFF9052) 
-                          : Colors.grey.shade300,
-                      shape: BoxShape.circle,
-                    ),
+          ),
+          // Indicator dots
+          Padding(
+            padding: const EdgeInsets.only(bottom: 24.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                onboardingData.length,
+                (index) => Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  height: 8,
+                  width: 8,
+                  decoration: BoxDecoration(
+                    color: _currentPage == index 
+                        ? const Color(0xFFFF9052) 
+                        : Colors.grey.shade300,
+                    shape: BoxShape.circle,
                   ),
                 ),
               ),
             ),
-            // Button area
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 24.0),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF9052),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  minimumSize: const Size(double.infinity, 50),
-                  elevation: 0,
+          ),
+          // Button area
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 24.0),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF9052),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
                 ),
-                onPressed: _nextPage,
-                child: const Text(
-                  "Next",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
+                minimumSize: const Size(double.infinity, 50),
+                elevation: 0,
+              ),
+              onPressed: _nextPage,
+              child: const Text(
+                "Next",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
