@@ -14,7 +14,9 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),
-        '/onboarding': (context) => const OnboardingScreen(), // Ganti dengan halaman utamamu
+        '/onboarding': (context) => const OnboardingScreen(),
+        '/register' : (context) => const RegisterScreen(),
+        '/dashboard' : (context) => const HomeScreen(), // Ganti dengan halaman utamamu
       },
     );
   }
