@@ -86,13 +86,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Container(
                       width: double.infinity,
                       height: MediaQuery.of(context).size.height * 0.62,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFDCF0FF),
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(160),
-                          bottomRight: Radius.circular(160),
-                        ),
-                      ),
+                      // decoration: const BoxDecoration(
+                      //   color: Color(0xFFDCF0FF),
+                      //   borderRadius: BorderRadius.only(
+                      //     bottomLeft: Radius.circular(160),
+                      //     bottomRight: Radius.circular(160),
+                      //   ),
+                      // ),
                       child: Center(
                         child: Image.asset(
                           data['image']!,
