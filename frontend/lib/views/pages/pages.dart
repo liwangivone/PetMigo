@@ -13,6 +13,7 @@ import 'package:frontend/models/model_login.dart';
 
 //BLoC
 import 'package:frontend/bloc/login_bloc.dart';
+import 'package:frontend/bloc/onboarding_bloc.dart';
 
 //Tampilan
 part 'splash_screen.dart';

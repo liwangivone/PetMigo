@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         ),
         GoRoute(
           path: '/onboarding',
-          builder: (context, state) => const OnboardingScreen(),
+          builder: (context, state) => OnboardingScreen(),
         ),
         GoRoute(
           path: '/register',

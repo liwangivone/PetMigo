@@ -5,46 +5,63 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return BlocProvider(
       create: (_) => LoginBloc(),
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                const SizedBox(height: 40),
                 const Text(
                   "Welcome back",
                   style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 16),
-                Image.asset('assets/images/petmigo_logo.png', height: 360),
+                const SizedBox(height: 12),
+                // Gambar disesuaikan agar tidak makan banyak space
+                Flexible(
+                  flex: 3,
+                  child: Image.asset(
+                    'assets/images/petmigo_logo.png',
+                    height: screenHeight * 0.28, // sekitar 30% layar
+                    fit: BoxFit.contain,
+                  ),
+                ),
                 const SizedBox(height: 24),
 
-                _PhoneInput(),
-                const SizedBox(height: 16),
-                _PasswordInput(),
-                const SizedBox(height: 24),
-
-                _LoginButton(),
-                const SizedBox(height: 16),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Don’t have an account? "),
-                    GestureDetector(
-                      onTap: () {
-                        context.go('/register');
-                      },
-                      child: const Text(
-                        "Sign Up",
-                        style: TextStyle(color: Colors.blue),
+                // Input dan tombol login
+                Expanded(
+                  flex: 4,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      _PhoneInput(),
+                      const SizedBox(height: 16),
+                      _PasswordInput(),
+                      const SizedBox(height: 24),
+                      _LoginButton(),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Don’t have an account? "),
+                          GestureDetector(
+                            onTap: () => context.go('/register'),
+                            child: const Text(
+                              "Sign Up",
+                              style: TextStyle(color: Colors.blue),
+                            ),
+                          ),
+                        ],
                       ),
-                    )
-                  ],
-                )
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -54,6 +71,7 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
+
 class _PhoneInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -62,7 +80,7 @@ class _PhoneInput extends StatelessWidget {
         return TextField(
           keyboardType: TextInputType.phone,
           decoration: const InputDecoration(
-            labelText: 'Phone number *',
+            labelText: 'Phone number',
             hintText: '0895-xxx-xxx',
             border: UnderlineInputBorder(),
           ),
@@ -82,7 +100,7 @@ class _PasswordInput extends StatelessWidget {
         return TextField(
           obscureText: true,
           decoration: const InputDecoration(
-            labelText: 'Password *',
+            labelText: 'Password',
             border: UnderlineInputBorder(),
           ),
           onChanged: (value) =>
