@@ -36,7 +36,7 @@ class LoginScreen extends StatelessWidget {
                     const Text("Don’t have an account? "),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(context, '/register');
+                        context.go('/register');
                       },
                       child: const Text(
                         "Sign Up",
@@ -110,10 +110,10 @@ class _LoginButton extends StatelessWidget {
               ),
               elevation: 0,
             ),
-            onPressed: state.isValid
+              onPressed: state.isValid
                 ? () {
                     context.read<LoginBloc>().add(LoginSubmitted());
-                    Navigator.pushReplacementNamed(context, '/dashboard');
+                    context.go('/dashboard');
                   }
                 : null,
             child: const Text(
