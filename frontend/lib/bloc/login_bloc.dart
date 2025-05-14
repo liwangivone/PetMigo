@@ -1,15 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-class LoginState {
-  final String phone;
-  final String password;
-  final bool isValid;
-
-  LoginState({
-    this.phone = '',
-    this.password = '',
-  }) : isValid = phone.isNotEmpty && password.isNotEmpty;
-}
+import 'package:frontend/models/model_login.dart';
 
 abstract class LoginEvent {}
 
