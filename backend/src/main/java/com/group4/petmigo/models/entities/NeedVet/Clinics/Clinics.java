@@ -16,9 +16,12 @@ public class Clinics {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long clinics_id;
 
+    @Column(name = "name", nullable = false)
     private String name;          // Changed from 'nama'
+    @Column(name = "location", nullable = false)
     private String location;      // Changed from 'lokasi'
-    private String openingHours;  // Changed from 'jadwalBuka'
+    @Column(name = "openinghours", nullable = false)
+    private String openinghours;  // Changed from 'jadwalBuka'
 
     @OneToMany(mappedBy = "clinics", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore

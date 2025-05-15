@@ -15,9 +15,9 @@ public class Chat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long chat_id;
     
-    private LocalDateTime timeCreated;
+    private LocalDateTime timecreated;
     private String status;
 
     @ManyToOne(fetch = FetchType.LAZY)
