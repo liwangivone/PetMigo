@@ -1,4 +1,4 @@
-package com.group4.backend.Model.Chat;
+package com.group4.petmigo.models.entities.Chat;
 
 import java.time.LocalDate;
 

@@ -1,12 +1,11 @@
-package com.group4.backend.Model.Chat;
-
+package com.group4.petmigo.models.entities.Chat;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.group4.backend.Model.NeedVet.Doctor.Doctor;
-import com.group4.backend.Model.User.User;
+import com.group4.petmigo.models.entities.NeedVet.Vet.Vet;
+import com.group4.petmigo.models.entities.User.User;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -26,8 +25,8 @@ public class Chat {
     private User user;  // Ensure this is the actual User entity, not Doctor
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "doctor_id", nullable = false)
-    private Doctor doctor;
+    @JoinColumn(name = "vet_id", nullable = false)
+    private Vet vet;
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
