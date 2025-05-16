@@ -14,13 +14,13 @@ public class Message {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long message_id;
 
-    private String username;
+    private String username; //data gak perlu nullable karena otomatis bukan user yang buat
     private String role;
-    private Long senderId;
-    private String messageText;
-    private LocalDate sentDate;
+    private Long sender_id;
+    private String messagetext;
+    private LocalDate sentdate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id", nullable = false)
