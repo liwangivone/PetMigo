@@ -1,6 +1,6 @@
 package com.group4.petmigo.DTO;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.Data;
 
@@ -11,6 +11,6 @@ public class UserDTO {
     private String username;
     private String phonenumber;
     private String email;
-    private LocalDate calendar; // ganti ke birthDate kalau perlu
-
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

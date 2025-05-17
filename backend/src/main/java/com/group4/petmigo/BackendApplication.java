@@ -1,4 +1,4 @@
-package com.group4.petmigo.models.entities;
+package com.group4.petmigo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
