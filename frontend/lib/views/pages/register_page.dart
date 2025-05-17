@@ -8,6 +8,7 @@ class RegisterScreen extends StatelessWidget {
     return BlocProvider(
       create: (_) => RegisterBloc(),
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -28,8 +29,8 @@ class RegisterScreen extends StatelessWidget {
                       const SizedBox(height: 24),
                       Center(
                         child: Image.asset(
-                          'assets/logo_petmigo.png',
-                          height: 80,
+                          'assets/images/petmigo_logo.png',
+                          height: 180,
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -39,11 +40,11 @@ class RegisterScreen extends StatelessWidget {
                         decoration: const InputDecoration(hintText: "Enter your full name"),
                       ),
                       const SizedBox(height: 16),
-                      Text("Phone number *"),
+                      Text("Email"),
                       TextField(
                         keyboardType: TextInputType.phone,
                         onChanged: (val) => bloc.add(RegisterPhoneChanged(val)),
-                        decoration: const InputDecoration(hintText: "0895-xxx-xxx"),
+                        decoration: const InputDecoration(hintText: "example@example.com"),
                       ),
                       const SizedBox(height: 16),
                       Text("Password *"),
@@ -79,7 +80,7 @@ class RegisterScreen extends StatelessWidget {
                               ? () {
                                   bloc.add(RegisterSubmitted());
                                   // Navigasi ke halaman login
-                                  context.go('/login');
+                                  context.go('/dashboard');
                                 }
                               : null,
                           child: const Text("Create account", style: TextStyle(color: Colors.white)),

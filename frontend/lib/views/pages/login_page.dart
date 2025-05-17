@@ -80,8 +80,8 @@ class _PhoneInput extends StatelessWidget {
         return TextField(
           keyboardType: TextInputType.phone,
           decoration: const InputDecoration(
-            labelText: 'Phone number',
-            hintText: '0895-xxx-xxx',
+            labelText: 'Email',
+            hintText: 'Example@example.com',
             border: UnderlineInputBorder(),
           ),
           onChanged: (value) =>
