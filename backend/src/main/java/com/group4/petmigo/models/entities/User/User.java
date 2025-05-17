@@ -1,7 +1,11 @@
 package com.group4.petmigo.models.entities.User;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.group4.petmigo.models.entities.pet.Pet;
@@ -30,11 +34,19 @@ public class User {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "calendar", nullable = false)
-    private LocalDate calendar;
+    @CreationTimestamp
+    @Column(name = "createdAt", updatable = false)
+    private LocalDateTime createdAt; // ini creation dan update jangan dihapus emang gak perlu tapi kan memang harus ada 
 
-    @Column(name = "uid", nullable = false)
-    private Long uid;
+    @UpdateTimestamp
+    private LocalDateTime updateAt;
+
+    @Column(name = "uid", nullable = false, unique = true)
+    private String uid;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private status status;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties(value = { "user" }, allowSetters = true) // Avoid circular reference for Pet

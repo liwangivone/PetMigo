@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.group4.petmigo.models.entities.Chat.Chat;
 import com.group4.petmigo.models.entities.NeedVet.Clinics.Clinics;
+import com.group4.petmigo.models.entities.User.status;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -42,6 +43,10 @@ public class Vet {
 
     @Column(nullable = false)
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private status status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "clinic_id", nullable = false)
