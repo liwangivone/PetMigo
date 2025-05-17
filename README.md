@@ -23,8 +23,8 @@ penambahan status agar chat bisa dilihat statusnya secara online atau tidak (ini
 - buka foldernya pakai vscode sesuai letak dimana anda clone
 - jangan lupa pergi ke resource folder dan click application.properties dan ganti urlnya dari origami ke nama database sesuai keinginanmu "NOTE : JANGAN PERNAH MEMAKAI NAMA DATABASE YANG SUDAH DIGUNAKAN KECUALI ANDA INGIN DROP TERLEBIH DAHULU"
 - anda juga bisa tanpa mengubah urlnya dan lansung play backendnya melalui folder petmigo dan file bernama BackendApplication.java
-- jika diarahkan login maka kamu harus isi user dan passwordnya digenerate di terminal
-- saat sudah play file tersebut anda harus membuka swagger dengan mengetik http://localhost:8080/swagger-ui/
+- saat sudah play file tersebut anda harus membuka swagger dengan mengetik http://localhost:8080/swagger-ui/index.html
+- jika diarahkan login maka kamu harus isi user dan passwordnya digenerate di terminal dan ulangin lagi ke http://localhost:8080/swagger-ui/index.html saat login berhasil
 - anda harus check registernya apakah sudah sesuai atau tidak
 - jika sudah mengecek harap check kembali di localhost phpmyadmin agar tidak ada kesalahan sama sekali
 - jika sudah semuanya then goodluck if there any problem or a bug please contact me dont change it please
