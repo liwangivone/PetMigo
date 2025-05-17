@@ -21,7 +21,7 @@ penambahan status agar chat bisa dilihat statusnya secara online atau tidak (ini
 # how to use 
 - clone terlebih dahulu, gak tau cara clone? saya punya link,berterimakasihlah sama our lord youtube dan our lord india people Link : https://www.youtube.com/watch?v=q9wc7hUrW8U
 - buka foldernya pakai vscode sesuai letak dimana anda clone
-- jangan lupa pergi ke resource folder dan click application.properties dan ganti urlnya dari capekanj ke nama database sesuai keinginanmu "NOTE : JANGAN PERNAH MEMAKAI NAMA DATABASE YANG SUDAH DIGUNAKAN KECUALI ANDA INGIN DROP TERLEBIH DAHULU"
+- jangan lupa pergi ke resource folder dan click application.properties dan ganti urlnya dari origami ke nama database sesuai keinginanmu "NOTE : JANGAN PERNAH MEMAKAI NAMA DATABASE YANG SUDAH DIGUNAKAN KECUALI ANDA INGIN DROP TERLEBIH DAHULU"
 - anda juga bisa tanpa mengubah urlnya dan lansung play backendnya melalui folder petmigo dan file bernama BackendApplication.java
 - saat sudah play file tersebut anda harus membuka swagger dengan mengetik http://localhost:8080/swagger-ui/
 - anda harus check registernya apakah sudah sesuai atau tidak
