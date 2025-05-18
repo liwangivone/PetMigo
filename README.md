@@ -1,44 +1,31 @@
-# Model dan Skema Database Backend
+# login
+login menggunakan email dan password 
 
-## Schema Database
+# register
+register hanya mengambil username, email, password, dan phone number (alasan kenapa ada email gak sesuai di petmigo figma adalah karena profile di figma ada email alhasil itu membingungkan bagaimana ada email tapi register tidak dan alasan lainnya karena login diganti menjadi email dan akan ditambahkan otp next time )
 
-### 1. User ke Pet
-- Relasi: One To Many dan Many To One
-- Deskripsi:
-  Satu user dapat memiliki banyak pet,
-  tetapi satu pet hanya dimiliki oleh satu user.
+## Penambahan lainnya
+# status
+penambahan status agar chat bisa dilihat statusnya secara online atau tidak (ini di pikirkan agar user mengetahui status apakah dokter online atau tidak atau user online atau tidak, ini dipikirkan dalam prespeksif pengguna)
 
-### 2. Pet ke Pet_Schedule
-- Relasi: One To Many dan Many To One
-- Deskripsi:
-  Satu pet dapat memiliki banyak jadwal (schedule),
-  tetapi satu jadwal hanya terkait dengan satu pet.
+## ADR
+# controller
+- menggunakan rest api oleh karena itu controller menggunakan adr ke 3
+- controller juga menggunakan MVC yaitu adr ke 1
+# Repository
+- repository menggunakan JPA yaitu ADR 5 soal depedency JPA
 
-### 3. User ke Chat dan Doctor ke Chat
-- Relasi: Many To One untuk masing-masing
-- Deskripsi:
-  Satu chat melibatkan satu user dan satu doctor.
-  Seorang user atau doctor bisa memiliki banyak chat.
+# NOTE for TEAM
+- try to use it and contact your back end if there any error thanks you
 
-### 4. Chat ke Message
-- Relasi: One To Many
-- Deskripsi:
-  Satu chat bisa memiliki banyak pesan (message),
-  tetapi satu pesan hanya terkait dengan satu chat.
-
-### 5. Doctor ke Clinics
-- Relasi: Many To One
-- Deskripsi:
-  Satu klinik bisa memiliki banyak dokter,
-  tetapi satu dokter hanya bekerja di satu klinik.
-
-# Perubahan pada Dependency
-
-## Penghapusan
-- Menghapus dependency Thymeleaf karena frontend menggunakan Flutter, bukan HTML.
-
-## Penambahan
-- Menambahkan dependency berikut:
-  - Springdoc OpenAPI (Swagger) untuk dokumentasi API
-  - Spring Boot Starter Mail untuk pengiriman email
-  - Lain-lain sesuai kebutuhan proyek
+# how to use 
+- clone terlebih dahulu, gak tau cara clone? saya punya link,berterimakasihlah sama our lord youtube dan our lord india people Link : https://www.youtube.com/watch?v=q9wc7hUrW8U
+- buka foldernya pakai vscode sesuai letak dimana anda clone
+- jangan lupa pergi ke resource folder dan click application.properties dan ganti urlnya dari origami ke nama database sesuai keinginanmu "NOTE : JANGAN PERNAH MEMAKAI NAMA DATABASE YANG SUDAH DIGUNAKAN KECUALI ANDA INGIN DROP TERLEBIH DAHULU"
+- anda juga bisa tanpa mengubah urlnya dan lansung play backendnya melalui folder petmigo dan file bernama BackendApplication.java
+- saat sudah play file tersebut anda harus membuka swagger dengan mengetik http://localhost:8080/swagger-ui/index.html
+- jika diarahkan login maka kamu harus isi user dan passwordnya digenerate di terminal dan ulangin lagi ke http://localhost:8080/swagger-ui/index.html saat login berhasil
+- anda harus check registernya apakah sudah sesuai atau tidak
+- jika sudah mengecek harap check kembali di localhost phpmyadmin agar tidak ada kesalahan sama sekali
+- jika sudah semuanya then goodluck if there any problem or a bug please contact me dont change it please
+- by itsukachiyogami
