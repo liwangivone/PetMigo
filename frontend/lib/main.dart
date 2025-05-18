@@ -11,8 +11,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GoRouter _router = GoRouter(
-      initialLocation: '/',
+    final GoRouter router = GoRouter(
+      initialLocation: '/dashboard',
       routes: [
         GoRoute(
           path: '/',
@@ -32,14 +32,14 @@ class MyApp extends StatelessWidget {
         ),
         GoRoute(
           path: '/dashboard',
-          builder: (context, state) => const HomeScreen(),
+          builder: (context, state) => const HomePage(),
         ),
       ],
     );
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      routerConfig: _router,
+      routerConfig: router,
     );
   }
 }
