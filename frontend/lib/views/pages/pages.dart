@@ -1,6 +1,3 @@
-import 'dart:async';
-import 'dart:developer';
-import 'dart:io';
 
 part 'splash_screen.dart';
 part 'onboarding_pages.dart';
