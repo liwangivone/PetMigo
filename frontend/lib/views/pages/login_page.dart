@@ -85,7 +85,7 @@ class _PhoneInput extends StatelessWidget {
             border: UnderlineInputBorder(),
           ),
           onChanged: (value) =>
-              context.read<LoginBloc>().add(PhoneChanged(value)),
+              context.read<LoginBloc>().add(EmailChanged(value)),
         );
       },
     );

@@ -1,4 +1,5 @@
 {
     "java.configuration.updateBuildConfiguration": "interactive",
-    "cmake.sourceDirectory": "D:/PetMigo/frontend/linux"
+    "cmake.sourceDirectory": "D:/PetMigo/frontend/linux",
+    "java.compile.nullAnalysis.mode": "automatic"
 }

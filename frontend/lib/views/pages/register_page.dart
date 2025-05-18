@@ -43,7 +43,7 @@ class RegisterScreen extends StatelessWidget {
                       Text("Email"),
                       TextField(
                         keyboardType: TextInputType.phone,
-                        onChanged: (val) => bloc.add(RegisterPhoneChanged(val)),
+                        onChanged: (val) => bloc.add(RegisterEmailChanged(val)),
                         decoration: const InputDecoration(hintText: "example@example.com"),
                       ),
                       const SizedBox(height: 16),
