@@ -24,7 +24,7 @@ public class UserService {
             throw new RuntimeException("Email sudah digunakan.");
         }
 
-        if (userRepository.existsByUsername(user.getUsername())) {
+        if (userRepository.existsByName(user.getName())) {
             throw new RuntimeException("Username sudah digunakan.");
         }
 
@@ -55,7 +55,7 @@ public class UserService {
     private UserDTO toDTO(User user){
         UserDTO dto = new UserDTO();
         dto.setUser_id(user.getUser_id());
-        dto.setUsername(user.getUsername());
+        dto.setName(user.getName());
         dto.setEmail(user.getEmail());
         dto.setPhonenumber(user.getPhonenumber());
         return dto;

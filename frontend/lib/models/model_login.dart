@@ -1,10 +1,10 @@
 class LoginState {
-  final String phone;
+  final String email;
   final String password;
   final bool isValid;
 
   LoginState({
-    this.phone = '',
+    this.email = '',
     this.password = '',
-  }) : isValid = phone.isNotEmpty && password.isNotEmpty;
+  }) : isValid = email.isNotEmpty && password.isNotEmpty;
 }

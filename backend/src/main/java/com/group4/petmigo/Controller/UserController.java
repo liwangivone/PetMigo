@@ -15,13 +15,12 @@ public class UserController {
     private UserService userService;
     
     @PostMapping("/register")
-    public UserDTO register(@RequestParam String username,String email, String password, String phonenumber) {
+    public UserDTO register(@RequestParam String name,String email, String password) {
         
         User user = new User();
-        user.setUsername(username);
+        user.setName(name);
         user.setEmail(email);
         user.setPassword(password);
-        user.setPhonenumber(phonenumber);
         return userService.register(user);
     }
 

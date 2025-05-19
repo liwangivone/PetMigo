@@ -8,7 +8,7 @@ import lombok.Data;
 public class UserDTO {
     
  private Long user_id;
-    private String username;
+    private String name;
     private String phonenumber;
     private String email;
     private LocalDateTime createdAt;

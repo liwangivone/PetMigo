@@ -1,3 +1,10 @@
+# Update
+## Fetching
+- login berhasil di fetching
+- register berhasil di fetching
+## model backend
+- mengubah username jadi user mengikuti frontend
+
 # login
 login menggunakan email dan password 
 
@@ -14,6 +21,9 @@ penambahan status agar chat bisa dilihat statusnya secara online atau tidak (ini
 - controller juga menggunakan MVC yaitu adr ke 1
 # Repository
 - repository menggunakan JPA yaitu ADR 5 soal depedency JPA
+# fetching
+- fetching menggunakan error handle yang dibuat sendiri dengan itu dia memakai ADR 9 hal ini diperlukan agar bisa mengetahui/debugging dalam HTTP
+
 
 # NOTE for TEAM
 - try to use it and contact your back end if there any error thanks you
