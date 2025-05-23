@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GoRouter router = GoRouter(
-      initialLocation: '/dashboard',
+      initialLocation: '/profile',
       routes: [
         GoRoute(
           path: '/',
@@ -33,6 +33,14 @@ class MyApp extends StatelessWidget {
         GoRoute(
           path: '/dashboard',
           builder: (context, state) => const HomePage(),
+        ),
+        GoRoute(
+          path: '/profile',
+          builder: (context, state) => const ProfilePage(),
+        ),
+        GoRoute(
+          path: '/edit-profile',
+          builder: (context, state) => const EditProfilePage(),
         ),
       ],
     );
