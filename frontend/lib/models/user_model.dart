@@ -1,65 +1,94 @@
-class UserProfile {
+// models/user.dart
+
+class User {
   final String id;
   final String name;
   final String email;
   final String phone;
   final String? dateOfBirth;
-  final String? photoUrl;
-  final String subscriptionType;
+  final String? profileImageUrl;
+  final bool isPremium;
 
-  UserProfile({
+  const User({
     required this.id,
     required this.name,
     required this.email,
     required this.phone,
     this.dateOfBirth,
-    this.photoUrl,
-    required this.subscriptionType,
+    this.profileImageUrl,
+    this.isPremium = false,
   });
 
-  // Create a copy of the current user with updated fields
-  UserProfile copyWith({
+  User copyWith({
+    String? id,
     String? name,
     String? email,
     String? phone,
     String? dateOfBirth,
-    String? photoUrl,
-    String? subscriptionType,
+    String? profileImageUrl,
+    bool? isPremium,
   }) {
-    return UserProfile(
-      id: this.id,
+    return User(
+      id: id ?? this.id,
       name: name ?? this.name,
       email: email ?? this.email,
       phone: phone ?? this.phone,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
-      photoUrl: photoUrl ?? this.photoUrl,
-      subscriptionType: subscriptionType ?? this.subscriptionType,
+      profileImageUrl: profileImageUrl ?? this.profileImageUrl,
+      isPremium: isPremium ?? this.isPremium,
     );
   }
 
-  // Create a UserProfile from JSON
-  factory UserProfile.fromJson(Map<String, dynamic> json) {
-    return UserProfile(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      email: json['email'] as String,
-      phone: json['phone'] as String,
-      dateOfBirth: json['dateOfBirth'] as String?,
-      photoUrl: json['photoUrl'] as String?,
-      subscriptionType: json['subscriptionType'] as String,
-    );
-  }
-
-  // Convert UserProfile to JSON
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
       'name': name,
       'email': email,
       'phone': phone,
       'dateOfBirth': dateOfBirth,
-      'photoUrl': photoUrl,
-      'subscriptionType': subscriptionType,
+      'profileImageUrl': profileImageUrl,
+      'isPremium': isPremium,
     };
+  }
+
+  factory User.fromMap(Map<String, dynamic> map) {
+    return User(
+      id: map['id'] ?? '',
+      name: map['name'] ?? '',
+      email: map['email'] ?? '',
+      phone: map['phone'] ?? '',
+      dateOfBirth: map['dateOfBirth'],
+      profileImageUrl: map['profileImageUrl'],
+      isPremium: map['isPremium'] ?? false,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'User(id: $id, name: $name, email: $email, phone: $phone, dateOfBirth: $dateOfBirth, profileImageUrl: $profileImageUrl, isPremium: $isPremium)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is User &&
+        other.id == id &&
+        other.name == name &&
+        other.email == email &&
+        other.phone == phone &&
+        other.dateOfBirth == dateOfBirth &&
+        other.profileImageUrl == profileImageUrl &&
+        other.isPremium == isPremium;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        name.hashCode ^
+        email.hashCode ^
+        phone.hashCode ^
+        dateOfBirth.hashCode ^
+        profileImageUrl.hashCode ^
+        isPremium.hashCode;
   }
 }
