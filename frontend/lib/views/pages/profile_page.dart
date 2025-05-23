@@ -247,7 +247,7 @@ class ProfileContent extends StatelessWidget {
                   color: Colors.transparent,
                   child: InkWell(
                     onTap: () {
-                      context.push('/subscription');
+                      context.go('/subscription');
                     },
                     borderRadius: BorderRadius.circular(16),
                     child: Padding(
