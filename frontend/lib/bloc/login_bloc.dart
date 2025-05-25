@@ -22,50 +22,51 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<EmailChanged>((event, emit) {
       emit(state.copyWith(
         email: event.email,
-        errorMessage: null, // Clear error when editing
+        errorMessage: null,
       ));
     });
 
     on<PasswordChanged>((event, emit) {
       emit(state.copyWith(
         password: event.password,
-        errorMessage: null, // Clear error when editing
+        errorMessage: null,
       ));
     });
 
-    on<LoginSubmitted>((event, emit) async {
-      if (!state.isValid) return;
+      on<LoginSubmitted>((event, emit) async {
+        if (!state.isValid) return;
 
-      emit(state.copyWith(isLoading: true, errorMessage: null));
-      
-      try {
-        final response = await http.post(
-          Uri.parse('http://localhost:8080/api/users/login'),
-          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-          body: {
-            'email': state.email,
-            'password': state.password,
-          },
-        );
+        emit(state.copyWith(isLoading: true, errorMessage: null));
+        
+        try {
+          final response = await http.post(
+            Uri.parse('http://localhost:8080/api/users/login'),
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: {
+              'email': state.email,
+              'password': state.password,
+            },
+          );
 
-        if (response.statusCode == 200) {
-          print('Login berhasil');
-          print('Response body: ${response.body}');
-          // You might want to emit a success state here
-          emit(state.copyWith(isLoading: false));
-          // Add navigation logic here or in the UI
-        } else {
+          if (response.statusCode == 200) {
+            print('Login berhasil');
+            print('Response body: ${response.body}');
+            emit(state.copyWith(
+              isLoading: false,
+              isSuccess: true, // Set success ke true
+            ));
+          } else {
+            emit(state.copyWith(
+              isLoading: false,
+              errorMessage: 'Email atau password salah',
+            ));
+          }
+        } catch (e) {
           emit(state.copyWith(
             isLoading: false,
-            errorMessage: 'Email atau password salah',
+            errorMessage: 'Terjadi kesalahan. Silakan coba lagi.',
           ));
         }
-      } catch (e) {
-        emit(state.copyWith(
-          isLoading: false,
-          errorMessage: 'Terjadi kesalahan. Silakan coba lagi.',
-        ));
-      }
-    });
+      });
   }
 }

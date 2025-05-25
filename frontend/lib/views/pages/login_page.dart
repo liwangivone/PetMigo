@@ -9,61 +9,69 @@ class LoginScreen extends StatelessWidget {
 
     return BlocProvider(
       create: (_) => LoginBloc(),
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Column(
-              children: [
-                const SizedBox(height: 40),
-                const Text(
-                  "Welcome back",
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                Flexible(
-                  flex: 3,
-                  child: Image.asset(
-                    'assets/images/petmigo_logo.png',
-                    height: screenHeight * 0.28,
-                    fit: BoxFit.contain,
+      child: BlocListener<LoginBloc, LoginState>(
+        listener: (context, state) {
+          if (state.isSuccess) {
+            // Navigasi ke halaman dashboard ketika login sukses
+            context.go('/dashboard');
+          }
+        },
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: Column(
+                children: [
+                  const SizedBox(height: 40),
+                  const Text(
+                    "Welcome back",
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
                   ),
-                ),
-                const SizedBox(height: 24),
+                  const SizedBox(height: 12),
+                  Flexible(
+                    flex: 3,
+                    child: Image.asset(
+                      'assets/images/petmigo_logo.png',
+                      height: screenHeight * 0.28,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
 
-                // Input dan tombol login
-                Expanded(
-                  flex: 4,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      _EmailInput(),
-                      const SizedBox(height: 16),
-                      _PasswordInput(),
-                      const SizedBox(height: 8),
-                      _ErrorMessage(),
-                      const SizedBox(height: 16),
-                      _LoginButton(),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text("Don't have an account? "),
-                          GestureDetector(
-                            onTap: () => context.go('/register'),
-                            child: const Text(
-                              "Sign Up",
-                              style: TextStyle(color: Colors.blue),
+                  // Input dan tombol login
+                  Expanded(
+                    flex: 4,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        _EmailInput(),
+                        const SizedBox(height: 16),
+                        _PasswordInput(),
+                        const SizedBox(height: 8),
+                        _ErrorMessage(),
+                        const SizedBox(height: 16),
+                        _LoginButton(),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Don't have an account? "),
+                            GestureDetector(
+                              onTap: () => context.go('/register'),
+                              child: const Text(
+                                "Sign Up",
+                                style: TextStyle(color: Colors.blue),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
