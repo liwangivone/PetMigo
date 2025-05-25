@@ -23,12 +23,11 @@ class LoginScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
-                // Gambar disesuaikan agar tidak makan banyak space
                 Flexible(
                   flex: 3,
                   child: Image.asset(
                     'assets/images/petmigo_logo.png',
-                    height: screenHeight * 0.28, // sekitar 30% layar
+                    height: screenHeight * 0.28,
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -40,16 +39,18 @@ class LoginScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      _PhoneInput(),
+                      _EmailInput(),
                       const SizedBox(height: 16),
                       _PasswordInput(),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 8),
+                      _ErrorMessage(),
+                      const SizedBox(height: 16),
                       _LoginButton(),
                       const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Don’t have an account? "),
+                          const Text("Don't have an account? "),
                           GestureDetector(
                             onTap: () => context.go('/register'),
                             child: const Text(
@@ -71,18 +72,20 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
-
-class _PhoneInput extends StatelessWidget {
+class _EmailInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LoginBloc, LoginState>(
       builder: (context, state) {
         return TextField(
-          keyboardType: TextInputType.phone,
-          decoration: const InputDecoration(
+          keyboardType: TextInputType.emailAddress,
+          decoration: InputDecoration(
             labelText: 'Email',
             hintText: 'Example@example.com',
-            border: UnderlineInputBorder(),
+            border: const UnderlineInputBorder(),
+            errorText: state.errorMessage != null && state.email.isEmpty
+                ? 'Email tidak boleh kosong'
+                : null,
           ),
           onChanged: (value) =>
               context.read<LoginBloc>().add(EmailChanged(value)),
@@ -99,13 +102,38 @@ class _PasswordInput extends StatelessWidget {
       builder: (context, state) {
         return TextField(
           obscureText: true,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Password',
-            border: UnderlineInputBorder(),
+            border: const UnderlineInputBorder(),
+            errorText: state.errorMessage != null && state.password.isEmpty
+                ? 'Password tidak boleh kosong'
+                : null,
           ),
           onChanged: (value) =>
               context.read<LoginBloc>().add(PasswordChanged(value)),
         );
+      },
+    );
+  }
+}
+
+class _ErrorMessage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<LoginBloc, LoginState>(
+      builder: (context, state) {
+        if (state.errorMessage != null && 
+            state.email.isNotEmpty && 
+            state.password.isNotEmpty) {
+          return Text(
+            state.errorMessage!,
+            style: const TextStyle(
+              color: Colors.red,
+              fontSize: 14,
+            ),
+          );
+        }
+        return const SizedBox.shrink();
       },
     );
   }
@@ -119,26 +147,27 @@ class _LoginButton extends StatelessWidget {
         return SizedBox(
           width: double.infinity,
           height: 50,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFF9924F),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
-              ),
-              elevation: 0,
-            ),
-              onPressed: state.isValid
-                ? () {
-                    context.read<LoginBloc>().add(LoginSubmitted());
-                    context.go('/dashboard');
-                  }
-                : null,
-            child: const Text(
-              "Login",
-              style: TextStyle(fontSize: 16),
-            ),
-          ),
+          child: state.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFF9924F),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    elevation: 0,
+                  ),
+                  onPressed: state.isValid
+                      ? () {
+                          context.read<LoginBloc>().add(LoginSubmitted());
+                        }
+                      : null,
+                  child: const Text(
+                    "Login",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
         );
       },
     );

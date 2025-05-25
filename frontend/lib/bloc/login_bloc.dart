@@ -1,3 +1,4 @@
+// login_bloc.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/models/model_login.dart';
 import 'package:http/http.dart' as http;
@@ -19,14 +20,24 @@ class LoginSubmitted extends LoginEvent {}
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc() : super(LoginState()) {
     on<EmailChanged>((event, emit) {
-      emit(LoginState(email: event.email, password: state.password));
+      emit(state.copyWith(
+        email: event.email,
+        errorMessage: null, // Clear error when editing
+      ));
     });
 
     on<PasswordChanged>((event, emit) {
-      emit(LoginState(email: state.email, password: event.password));
+      emit(state.copyWith(
+        password: event.password,
+        errorMessage: null, // Clear error when editing
+      ));
     });
 
     on<LoginSubmitted>((event, emit) async {
+      if (!state.isValid) return;
+
+      emit(state.copyWith(isLoading: true, errorMessage: null));
+      
       try {
         final response = await http.post(
           Uri.parse('http://localhost:8080/api/users/login'),
@@ -40,13 +51,20 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         if (response.statusCode == 200) {
           print('Login berhasil');
           print('Response body: ${response.body}');
-          // Tambahkan logic lanjut jika perlu
+          // You might want to emit a success state here
+          emit(state.copyWith(isLoading: false));
+          // Add navigation logic here or in the UI
         } else {
-          print('Login gagal: ${response.statusCode}');
-          print('Response body: ${response.body}');
+          emit(state.copyWith(
+            isLoading: false,
+            errorMessage: 'Email atau password salah',
+          ));
         }
       } catch (e) {
-        print('Error saat koneksi ke server: $e');
+        emit(state.copyWith(
+          isLoading: false,
+          errorMessage: 'Terjadi kesalahan. Silakan coba lagi.',
+        ));
       }
     });
   }
