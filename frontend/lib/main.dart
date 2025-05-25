@@ -42,6 +42,10 @@ class MyApp extends StatelessWidget {
           path: '/edit-profile',
           builder: (context, state) => const EditProfilePage(),
         ),
+          GoRoute(
+          path: '/askai',
+          builder: (context, state) => const AskAIWelcome(),
+        ),
       ],
     );
 

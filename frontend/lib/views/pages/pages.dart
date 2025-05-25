@@ -23,4 +23,5 @@ part 'login_page.dart';
 part 'tnc_page.dart';
 part 'home_page.dart';
 part 'profile_page.dart';
+part 'askAI_page.dart';
 
