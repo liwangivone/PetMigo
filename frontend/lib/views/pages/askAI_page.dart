@@ -1,50 +1,55 @@
 part of 'pages.dart';
 
 //Halaman depan
-
-class askAIWelcome extends StatelessWidget {
-  const askAIWelcome({super.key});
+class AskAIWelcome extends StatelessWidget {
+  const AskAIWelcome({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Spacer(),
-            const Text("Hi there! I’m Mora", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            Image.asset('assets/robot.png', height: 200), // Ganti sesuai path gambar
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12),
-              child: Text(
-                "Your smart companion for anything pet-related...",
-                textAlign: TextAlign.center,
+        child: Center( 
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Spacer(),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.0),
+                child: Text(
+                  "Hi there! I’m Mora",
+                  textAlign: TextAlign.center, 
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const AskAIChatPage()));
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-              child: const Text("Start Chat"),
-            ),
-            TextButton(
-              onPressed: () {},
-              child: const Text("View History"),
-            ),
-            const Spacer(),
-            BottomNavigationBar(
-              currentIndex: 1,
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.pets), label: "My Pet"),
-                BottomNavigationBarItem(icon: Icon(Icons.android), label: "Ask AI"),
-                BottomNavigationBarItem(icon: Icon(Icons.local_hospital), label: "Need Vet"),
-                BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: "My Expenses"),
-              ],
-            ),
-          ],
+              const SizedBox(height: 16),
+              Image.asset('assets/images/robot_mora.png', height: 200),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12),
+                child: Text(
+                  "Your smart companion for anything pet-related. "
+                  "Ask me anything about your beloved pet and let’s find the best care together.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AskAIChatPage()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text("Start Chat", style: TextStyle(fontSize: 16)),
+              ),
+              const Spacer(),
+            ],
+          ),
         ),
       ),
     );
@@ -76,13 +81,7 @@ class AskAIChatPage extends StatelessWidget {
                   const DrawerHeader(
                     child: Text("Mora", style: TextStyle(fontSize: 24)),
                   ),
-                  const ListTile(title: Text("Today")),
-                  const ListTile(title: Text("Cat is not feeling well")),
-                  const ListTile(title: Text("How to handle allergies")),
-                  const ListTile(title: Text("Yesterday")),
-                  const ListTile(title: Text("How to potty train a 5 month year old dog")),
-                  const ListTile(title: Text("Previous")),
-                  const ListTile(title: Text("My dog doesn’t want to eat his favourite food")),
+                  const ListTile(title: Text("Anda Belum Memiliki Riwayat Chat")),
                   ListTile(
                     title: const Text("Back To Main Page"),
                     onTap: () => context.go('/dashboard'),
