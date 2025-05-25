@@ -370,7 +370,7 @@ class _AskAIChatPageState extends State<AskAIChatPage> {
                 const SizedBox(width: 12),
                 Container(
                   decoration: const BoxDecoration(
-                    color: Color(0xFFE0E0E0),
+                    color: Color.fromARGB(255, 0, 115, 255),
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
