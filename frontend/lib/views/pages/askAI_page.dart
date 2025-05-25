@@ -7,6 +7,7 @@ class AskAIWelcome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center( 
           child: Column(
@@ -61,67 +62,86 @@ class AskAIChatPage extends StatelessWidget {
   const AskAIChatPage({super.key});
 
   void _openDrawer(BuildContext context) {
-  showGeneralDialog(
-    context: context,
-    barrierLabel: "Menu",
-    barrierDismissible: true,
-    barrierColor: Colors.black.withOpacity(0.3),
-    transitionDuration: const Duration(milliseconds: 300),
-    pageBuilder: (context, animation, secondaryAnimation) {
-      return Align(
-        alignment: Alignment.centerLeft,
-        child: FractionallySizedBox(
-          widthFactor: 0.7,
-          child: Material(
-            color: Colors.white,
-            child: SafeArea(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  const DrawerHeader(
-                    child: Text("Mora", style: TextStyle(fontSize: 24)),
-                  ),
-                  const ListTile(title: Text("Anda Belum Memiliki Riwayat Chat")),
-                  ListTile(
-                    title: const Text("Back To Main Page"),
-                    onTap: () => context.go('/dashboard'),
-                  ),
-                ],
+    showGeneralDialog(
+      context: context,
+      barrierLabel: "Menu",
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.3),
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: FractionallySizedBox(
+            widthFactor: 0.7,
+            child: Material(
+              color: Colors.white,
+              child: SafeArea(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    const DrawerHeader(
+                      child: Text("Mora", style: TextStyle(fontSize: 24)),
+                    ),
+                    const ListTile(title: Text("Anda Belum Memiliki Riwayat Chat")),
+                    ListTile(
+                      title: const Text("Back To Main Page"),
+                      onTap: () => context.go('/dashboard'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      );
-    },
-    transitionBuilder: (context, animation, secondaryAnimation, child) {
-      return SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(-1, 0),
-          end: Offset.zero,
-        ).animate(animation),
-        child: child,
-      );
-    },
-  );
-}
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(-1, 0),
+            end: Offset.zero,
+          ).animate(animation),
+          child: child,
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, 
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 2,
         leading: IconButton(
-          icon: const Icon(Icons.menu),
+          icon: const Icon(Icons.menu, color: Colors.black),
           onPressed: () => _openDrawer(context),
         ),
-        title: const Text("Mora"),
+        title: Row(
+          children: [
+            CircleAvatar(
+              backgroundImage: AssetImage('assets/images/robot_mora.png'),
+              radius: 16,
+            ),
+            const SizedBox(width: 10),
+            const Text(
+              "Mora",
+              style: TextStyle(
+                color: Colors.black87,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+          ],
+        ),
       ),
       body: Column(
         children: [
           const Padding(
             padding: EdgeInsets.all(12.0),
             child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text("Today", style: TextStyle(color: Colors.grey)),
+              alignment: Alignment.center,
+              child: Text("Hari Ini", style: TextStyle(color: Colors.grey)),
             ),
           ),
           Padding(
@@ -166,7 +186,12 @@ class AskAIChatPage extends StatelessWidget {
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: "Type here...",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
+                      fillColor: Colors.grey.shade100,
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide.none,
+                      ),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     ),
                   ),
