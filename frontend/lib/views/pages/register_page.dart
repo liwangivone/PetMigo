@@ -79,8 +79,7 @@ class RegisterScreen extends StatelessWidget {
                           onPressed: state.isValid
                               ? () {
                                   bloc.add(RegisterSubmitted());
-                                  // Navigasi ke halaman login
-                                  context.go('/dashboard');
+                                  context.go('/login');
                                 }
                               : null,
                           child: const Text("Create account", style: TextStyle(color: Colors.white)),
