@@ -18,6 +18,7 @@ dependencies:
   shared_preferences: ^2.5.3
   http: ^1.4.0
   pie_chart: ^5.4.0
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:

@@ -72,32 +72,32 @@ class OnboardingScreen extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final data = onboardingData[index];
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Flexible(
-                                flex: 5,
+                                flex: 30,
                                 child: Center(
                                   child: Image.asset(
                                     data['image']!,
                                     fit: BoxFit.contain,
-                                    height: MediaQuery.of(context).size.height * 0.35,
+                                    height: MediaQuery.of(context).size.height * 0.37,
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 10),
                               Flexible(
-                                flex: 4,
+                                flex: 10,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
                                       data['title']!,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.black,
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,                          
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
@@ -105,10 +105,10 @@ class OnboardingScreen extends StatelessWidget {
                                     Text(
                                       data['description']!,
                                       textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black54,
-                                      ),
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.black,
+                                        fontSize: 15,
+                                      )
                                     ),
                                   ],
                                 ),
@@ -128,8 +128,8 @@ class OnboardingScreen extends StatelessWidget {
                         onboardingData.length,
                         (index) => Container(
                           margin: const EdgeInsets.symmetric(horizontal: 4),
-                          height: 8,
-                          width: 8,
+                          height: 15,
+                          width: 15,
                           decoration: BoxDecoration(
                             color: state.currentPage == index
                                 ? const Color(0xFFFF9052)
@@ -145,7 +145,7 @@ class OnboardingScreen extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 24.0),
                     child: SizedBox(
                       width: double.infinity,
-                      height: 50,
+                      height: 45,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFFF9052),
@@ -155,12 +155,12 @@ class OnboardingScreen extends StatelessWidget {
                           elevation: 0,
                         ),
                         onPressed: () => _nextPage(context, state.currentPage),
-                        child: const Text(
+                        child: Text(
                           "Next",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                          style: GoogleFonts.poppins(
                             color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 18,
                           ),
                         ),
                       ),

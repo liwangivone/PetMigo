@@ -21,6 +21,7 @@ import 'package:frontend/bloc/my_expenses_bloc/expenses_event.dart';
 
 //Dll
 import 'package:pie_chart/pie_chart.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 //Tampilan
@@ -34,5 +35,6 @@ part 'profile_page.dart';
 part 'askAI_page.dart';
 part 'my_expenses_page.dart';
 part 'bottom_navbar.dart';
+part 'add_new_pet.dart';
 
 
