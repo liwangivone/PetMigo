@@ -14,23 +14,27 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GoRouter router = GoRouter(
-      initialLocation: '/dashboard',
+      initialLocation: '/onboarding',
       routes: [
         GoRoute(
           path: '/',
           builder: (context, state) => const SplashScreen(),
         ),
         GoRoute(
-          path: '/login',
-          builder: (context, state) => const LoginScreen(),
-        ),
-        GoRoute(
           path: '/onboarding',
           builder: (context, state) => OnboardingScreen(),
         ),
         GoRoute(
+          path: '/login',
+          builder: (context, state) => const LoginScreen(),
+        ),
+        GoRoute(
           path: '/register',
           builder: (context, state) => const RegisterScreen(),
+        ),
+        GoRoute(
+          path: '/choosepet',
+          builder: (context, state) => const ChoosePetPage(),
         ),
         GoRoute(
           path: '/dashboard',
