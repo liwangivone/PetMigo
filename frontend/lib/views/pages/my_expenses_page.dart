@@ -4,6 +4,7 @@ class MyExpensesPage extends StatefulWidget {
   const MyExpensesPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _MyExpensesPageState createState() => _MyExpensesPageState();
 }
 
@@ -129,17 +130,7 @@ class _MyExpensesPageState extends State<MyExpensesPage> {
           return const Center(child: Text("Unknown error"));
         },
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 3,
-        selectedItemColor: Colors.orange,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.pets), label: "My Pet"),
-          BottomNavigationBarItem(icon: Icon(Icons.smart_toy), label: "Ask AI"),
-          BottomNavigationBarItem(icon: Icon(Icons.local_hospital), label: "Need Vet"),
-          BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: "My Expenses"),
-        ],
-      ),
+      bottomNavigationBar: const BottomNavbar(currentIndex: 3),
     );
   }
 

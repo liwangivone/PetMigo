@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/bloc/my_expenses_bloc/expenses_bloc.dart';
 import 'views/pages/pages.dart';
 import 'package:go_router/go_router.dart';
 
@@ -53,9 +55,14 @@ class MyApp extends StatelessWidget {
       ],
     );
 
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      routerConfig: router,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => ExpensesBloc()),
+      ],
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        routerConfig: router,
+      ),
     );
   }
 }

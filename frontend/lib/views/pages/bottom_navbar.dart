@@ -37,7 +37,7 @@ class BottomNavbar extends StatelessWidget {
         elevation: 0,
         selectedFontSize: 12,
         unselectedFontSize: 12,
-        selectedItemColor: Color(0xFFFF7A00), // Orange highlight
+        selectedItemColor: const Color(0xFFFF7A00), // Orange highlight
         unselectedItemColor: Colors.grey.shade500,
         currentIndex: currentIndex,
         onTap: (index) => _onTap(context, index),
