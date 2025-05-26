@@ -9,6 +9,7 @@ import com.group4.petmigo.models.entities.User.User;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 @Data
 @Entity
 public class Chat {
@@ -20,12 +21,12 @@ public class Chat {
     private LocalDateTime timecreated;
     private String status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;  // Ensure this is the actual User entity, not Doctor
+    @ManyToOne
+    @JoinColumn(name = "user_id") // atau "vet_id", tergantung desain
+    private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vet_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "vet_id")
     private Vet vet;
 
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)

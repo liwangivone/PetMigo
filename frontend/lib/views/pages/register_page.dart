@@ -34,20 +34,20 @@ class RegisterScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 32),
-                      Text("Full name *"),
+                      const Text("Full name *"),
                       TextField(
                         onChanged: (val) => bloc.add(RegisterNameChanged(val)),
                         decoration: const InputDecoration(hintText: "Enter your full name"),
                       ),
                       const SizedBox(height: 16),
-                      Text("Email"),
+                      const Text("Email"),
                       TextField(
                         keyboardType: TextInputType.phone,
                         onChanged: (val) => bloc.add(RegisterEmailChanged(val)),
                         decoration: const InputDecoration(hintText: "example@example.com"),
                       ),
                       const SizedBox(height: 16),
-                      Text("Password *"),
+                      const Text("Password *"),
                       TextField(
                         obscureText: true,
                         onChanged: (val) => bloc.add(RegisterPasswordChanged(val)),

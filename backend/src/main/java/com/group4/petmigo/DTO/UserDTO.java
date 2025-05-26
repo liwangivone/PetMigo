@@ -7,10 +7,11 @@ import lombok.Data;
 @Data
 public class UserDTO {
     
- private Long user_id;
+ private Long userid;
     private String name;
     private String phonenumber;
     private String email;
+    private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

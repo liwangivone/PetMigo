@@ -1,0 +1,2 @@
+D:/~Kuliah/fetching2/PetMigo/frontend/android/app/.cxx/RelWithDebInfo/9a6u3w5b/arm64-v8a/CMakeFiles/edit_cache.dir
+D:/~Kuliah/fetching2/PetMigo/frontend/android/app/.cxx/RelWithDebInfo/9a6u3w5b/arm64-v8a/CMakeFiles/rebuild_cache.dir

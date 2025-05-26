@@ -1,12 +1,6 @@
 package com.group4.petmigo.models.entities.NeedVet.Vet;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.group4.petmigo.models.entities.Chat.Chat;
 import com.group4.petmigo.models.entities.NeedVet.Clinics.Clinics;
 import com.group4.petmigo.models.entities.User.status;
 
@@ -21,10 +15,10 @@ public class Vet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "vet_id")
-    private int vet_id;
+    private Long vetid;
 
     @Column(nullable = false)
-    private String username;
+    private String name;
 
     @Column(nullable = false)
     private String specialization;
@@ -36,7 +30,7 @@ public class Vet {
     private String overview;
 
     @Column(name = "schedule", nullable = false)
-    private LocalDate schedule; // Fixed typo from 'scedule'
+    private String schedule; 
 
     @Column(nullable = false)
     private String email;
@@ -49,12 +43,8 @@ public class Vet {
     private status status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "clinic_id", nullable = false)
+    @JoinColumn(name = "clinic_id", nullable = true)
     @JsonIgnore
     private Clinics clinics;
 
-    @OneToMany(mappedBy = "vet", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties(value = {"vet"}, allowSetters = true)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private List<Chat> chat;
 }

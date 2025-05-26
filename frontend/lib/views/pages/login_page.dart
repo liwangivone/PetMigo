@@ -155,6 +155,26 @@ class _LoginButton extends StatelessWidget {
         return SizedBox(
           width: double.infinity,
           height: 50,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFF9924F),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
+              ),
+              elevation: 0,
+            ),
+              onPressed: state.isValid
+                ? () {
+                    context.read<LoginBloc>().add(LoginSubmitted());
+                    context.go('/dashboard');
+                  }
+                : null,
+            child: const Text(
+              "Login",
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
           child: state.isLoading
               ? const Center(child: CircularProgressIndicator())
               : ElevatedButton(
