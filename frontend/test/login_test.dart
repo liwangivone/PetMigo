@@ -4,7 +4,6 @@ import 'package:frontend/bloc/login_bloc.dart';
 import 'package:frontend/models/model_login.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
-import 'dart:convert';
 
 // Mock HTTP Client
 class MockClient extends Mock implements http.Client {}
