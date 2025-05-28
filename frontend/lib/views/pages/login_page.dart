@@ -169,6 +169,7 @@ class _LoginButton extends StatelessWidget {
                   onPressed: state.isValid
                       ? () {
                           context.read<LoginBloc>().add(LoginSubmitted());
+                          context.go('/dashboard');
                         }
                       : null,
                   child: const Text(

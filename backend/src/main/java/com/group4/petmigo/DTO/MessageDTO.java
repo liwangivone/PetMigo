@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class MessageDTO {
     private Long message_id;
-    private String username;
+    private String name;
     private String role;
     private Long senderId;
     private String messageText;

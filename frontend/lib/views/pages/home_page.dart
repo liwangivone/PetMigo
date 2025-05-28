@@ -119,21 +119,8 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        selectedItemColor: Colors.orange,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.pets), label: "My Pet"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.smart_toy), label: "Ask AI"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.local_hospital), label: "Need Vet"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.attach_money), label: "My Expenses"),
-        ],
-      ),
+      bottomNavigationBar: const BottomNavbar(currentIndex: 0),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: Colors.blue,

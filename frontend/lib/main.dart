@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/bloc/my_expenses_bloc/expenses_bloc.dart';
 import 'views/pages/pages.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,23 +14,27 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GoRouter router = GoRouter(
-      initialLocation: '/',
+      initialLocation: '/onboarding',
       routes: [
         GoRoute(
           path: '/',
           builder: (context, state) => const SplashScreen(),
         ),
         GoRoute(
-          path: '/login',
-          builder: (context, state) => const LoginScreen(),
-        ),
-        GoRoute(
           path: '/onboarding',
           builder: (context, state) => OnboardingScreen(),
         ),
         GoRoute(
+          path: '/login',
+          builder: (context, state) => const LoginScreen(),
+        ),
+        GoRoute(
           path: '/register',
           builder: (context, state) => const RegisterScreen(),
+        ),
+        GoRoute(
+          path: '/choosepet',
+          builder: (context, state) => const ChoosePetPage(),
         ),
         GoRoute(
           path: '/dashboard',
@@ -42,12 +48,25 @@ class MyApp extends StatelessWidget {
           path: '/edit-profile',
           builder: (context, state) => const EditProfilePage(),
         ),
+          GoRoute(
+          path: '/askai',
+          builder: (context, state) => const AskAIWelcome(),
+        ),
+        GoRoute(
+          path: '/myexpenses', 
+          builder: (context, state) => const MyExpensesPage(),
+        ),
       ],
     );
 
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      routerConfig: router,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => ExpensesBloc()),
+      ],
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        routerConfig: router,
+      ),
     );
   }
 }

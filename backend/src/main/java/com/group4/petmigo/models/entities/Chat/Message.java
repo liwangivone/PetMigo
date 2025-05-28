@@ -1,6 +1,6 @@
 package com.group4.petmigo.models.entities.Chat;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -16,11 +16,11 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long message_id;
 
-    private String username; //data gak perlu nullable karena otomatis bukan user yang buat
+    private String name; //data gak perlu nullable karena otomatis bukan user yang buat
     private String role;
     private Long sender_id;
     private String messagetext;
-    private LocalDate sentdate;
+    private LocalDateTime sentdate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id", nullable = false)
