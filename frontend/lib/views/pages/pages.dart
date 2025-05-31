@@ -24,9 +24,6 @@ import 'package:frontend/bloc/my_expenses_bloc/expenses_event.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-//widgets
-import 'package:frontend/widgets/vet_card.dart';
-
 //Tampilan
 part 'vets_list_page.dart';
 part 'splash_screen.dart';
