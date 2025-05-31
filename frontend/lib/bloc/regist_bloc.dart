@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 
+// EVENTS
 abstract class RegisterEvent {}
 
 class RegisterEmailChanged extends RegisterEvent {
@@ -22,19 +23,26 @@ class RegisterTermsToggled extends RegisterEvent {}
 
 class RegisterSubmitted extends RegisterEvent {}
 
+// STATE
 class RegisterState {
   final String email;
   final String name;
   final String password;
   final bool agreed;
-  final bool isValid;
 
-  RegisterState({
+  const RegisterState({
     this.email = '',
     this.name = '',
     this.password = '',
     this.agreed = false,
-  }) : isValid = email.isNotEmpty && name.isNotEmpty && password.isNotEmpty && agreed;
+  });
+
+  bool get isValid {
+    return _isEmailValid(email) &&
+        name.isNotEmpty &&
+        password.length >= 6 &&
+        agreed;
+  }
 
   RegisterState copyWith({
     String? email,
@@ -49,14 +57,30 @@ class RegisterState {
       agreed: agreed ?? this.agreed,
     );
   }
+
+  static bool _isEmailValid(String email) {
+    return email.contains('@gmail.com') && email.contains('.');
+  }
 }
 
+// BLOC
 class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
-  RegisterBloc() : super(RegisterState()) {
-    on<RegisterEmailChanged>((event, emit) => emit(state.copyWith(email: event.email)));
-    on<RegisterNameChanged>((event, emit) => emit(state.copyWith(name: event.name)));
-    on<RegisterPasswordChanged>((event, emit) => emit(state.copyWith(password: event.password)));
-    on<RegisterTermsToggled>((event, emit) => emit(state.copyWith(agreed: !state.agreed)));
+  RegisterBloc() : super(const RegisterState()) {
+    on<RegisterEmailChanged>((event, emit) {
+      emit(state.copyWith(email: event.email));
+    });
+
+    on<RegisterNameChanged>((event, emit) {
+      emit(state.copyWith(name: event.name));
+    });
+
+    on<RegisterPasswordChanged>((event, emit) {
+      emit(state.copyWith(password: event.password));
+    });
+
+    on<RegisterTermsToggled>((event, emit) {
+      emit(state.copyWith(agreed: !state.agreed));
+    });
 
     on<RegisterSubmitted>((event, emit) async {
       if (!state.isValid) {
@@ -78,7 +102,6 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
         if (response.statusCode == 200) {
           print('Registrasi berhasil');
           print('Response: ${response.body}');
-          // Lanjutkan logic jika perlu
         } else {
           print('Registrasi gagal: ${response.statusCode}');
           print('Response: ${response.body}');
