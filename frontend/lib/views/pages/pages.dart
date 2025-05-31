@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:frontend/models/model_login.dart';
 import 'package:frontend/models/user_model.dart';
 import 'package:frontend/models/expenses_model.dart';
+import 'package:frontend/models/vet_models.dart';
 
 //BLoC
 import 'package:frontend/bloc/login_bloc.dart';
@@ -23,8 +24,11 @@ import 'package:frontend/bloc/my_expenses_bloc/expenses_event.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+//widgets
+import 'package:frontend/widgets/vet_card.dart';
 
 //Tampilan
+part 'vets_list_page.dart';
 part 'splash_screen.dart';
 part 'onboarding_pages.dart';
 part 'register_page.dart';
@@ -36,5 +40,6 @@ part 'askAI_page.dart';
 part 'my_expenses_page.dart';
 part 'bottom_navbar.dart';
 part 'add_new_pet.dart';
+part 'vet_detail_page.dart';
 
 
