@@ -1,7 +1,7 @@
 package com.group4.petmigo.Repository;
 
 import java.util.List;
-
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -14,4 +14,5 @@ public interface UserRepository extends JpaRepository<User, Long>{
     boolean existsByName(String name);
     User findByEmail(String email);
     List<User> findTopByOrderByUidDesc();
+    Optional<User> findByUserid(Long userid);
 }

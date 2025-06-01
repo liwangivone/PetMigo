@@ -13,9 +13,7 @@ import com.group4.petmigo.models.entities.User.status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
 public class UserServiceTest {
 
     @Mock
@@ -28,17 +26,16 @@ public class UserServiceTest {
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.openMocks(this);
+        MockitoAnnotations.openMocks(this); // Init mocks
 
         user = new User();
         user.setUserid(1L);
+        user.setUid("123");  // Ganti ke Long kalau service mengharapkan Long
         user.setName("testuser");
         user.setEmail("test@example.com");
         user.setPassword("password");
         user.setPhonenumber("12345678");
         user.setStatus(status.offline);
-
-        
     }
 
     @Test
@@ -46,7 +43,7 @@ public class UserServiceTest {
         when(userRepository.existsByEmail(user.getEmail())).thenReturn(false);
         when(userRepository.existsByName(user.getName())).thenReturn(false);
         when(userRepository.findTopByOrderByUidDesc()).thenReturn(Collections.singletonList(user));
-        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArguments()[0]);
+        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
 
         UserDTO result = userService.register(user);
 
@@ -65,6 +62,7 @@ public class UserServiceTest {
         });
 
         assertEquals("Email sudah digunakan.", exception.getMessage());
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
@@ -75,6 +73,7 @@ public class UserServiceTest {
 
         assertNotNull(result);
         assertEquals(user.getEmail(), result.getEmail());
+        assertEquals(user.getName(), result.getName());
     }
 
     @Test
@@ -87,5 +86,15 @@ public class UserServiceTest {
 
         assertEquals("email atau password salah", exception.getMessage());
     }
-    
+
+    @Test
+    public void testLoginFailUserNotFound() {
+        when(userRepository.findByEmail("notfound@example.com")).thenReturn(null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            userService.Login("notfound@example.com", "anyPassword");
+        });
+
+        assertEquals("email atau password salah", exception.getMessage());
+    }
 }

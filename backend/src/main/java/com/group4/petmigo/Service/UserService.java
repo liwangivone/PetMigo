@@ -114,6 +114,15 @@ public class UserService {
     return toDTO(userRepository.save(user));
     }
 
+    // Method untuk dapatkan User lengkap beserta pets berdasarkan ID
+    public User getUserProfileById(Long userId) {
+        Optional<User> userOpt = userRepository.findByUserid(userId);
+        if (userOpt.isEmpty()) {
+            throw new RuntimeException("User dengan ID " + userId + " tidak ditemukan");
+        }
+        return userOpt.get();
+    }
+
 
 
     // ini otomatis online offline
