@@ -13,7 +13,7 @@ class HomePage extends StatelessWidget {
         elevation: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -123,8 +123,9 @@ class HomePage extends StatelessWidget {
 
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
-        backgroundColor: Colors.blue,
-        child: const Icon(Icons.add),
+        shape: const CircleBorder(),
+        backgroundColor: const Color(0XFF60B5FF),
+        child: const Icon(Icons.add, color: Colors.white,),
       ),
     );
   }

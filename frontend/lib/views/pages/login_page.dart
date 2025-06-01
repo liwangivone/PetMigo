@@ -20,13 +20,15 @@ class LoginScreen extends StatelessWidget {
           backgroundColor: Colors.white,
           body: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 30),
               child: Column(
                 children: [
-                  const SizedBox(height: 40),
-                  const Text(
+                  const SizedBox(height: 60),
+                  Text(
                     "Welcome back",
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.poppins(
+                      fontSize: 28, 
+                      fontWeight: FontWeight.w600),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 12),
@@ -57,12 +59,20 @@ class LoginScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text("Don't have an account? "),
+                            Text(
+                              "Don't have an account?",
+                              style: GoogleFonts.poppins(
+                                color: Colors.black,
+                              ),
+                            ),
                             GestureDetector(
                               onTap: () => context.go('/register'),
-                              child: const Text(
+                              child: Text(
                                 "Sign Up",
-                                style: TextStyle(color: Colors.blue),
+                                style: GoogleFonts.poppins(
+                                  color: Colors.blue, 
+                                  decoration: TextDecoration.underline, 
+                                  decorationColor: Colors.blue),
                               ),
                             ),
                           ],
@@ -89,10 +99,10 @@ class _EmailInput extends StatelessWidget {
           keyboardType: TextInputType.emailAddress,
           decoration: InputDecoration(
             labelText: 'Email',
-            hintText: 'Example@example.com',
+            hintText: 'ivone@gmail.com',
             border: const UnderlineInputBorder(),
             errorText: state.errorMessage != null && state.email.isEmpty
-                ? 'Email tidak boleh kosong'
+                ? 'Email is required'
                 : null,
           ),
           onChanged: (value) =>
@@ -112,9 +122,12 @@ class _PasswordInput extends StatelessWidget {
           obscureText: true,
           decoration: InputDecoration(
             labelText: 'Password',
+            labelStyle: GoogleFonts.poppins(),
+            hintText: '*******',
+            hintStyle: GoogleFonts.poppins(),
             border: const UnderlineInputBorder(),
             errorText: state.errorMessage != null && state.password.isEmpty
-                ? 'Password tidak boleh kosong'
+                ? 'Password is required'
                 : null,
           ),
           onChanged: (value) =>
@@ -135,7 +148,7 @@ class _ErrorMessage extends StatelessWidget {
             state.password.isNotEmpty) {
           return Text(
             state.errorMessage!,
-            style: const TextStyle(
+            style: GoogleFonts.poppins(
               color: Colors.red,
               fontSize: 14,
             ),
@@ -152,17 +165,19 @@ class _LoginButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<LoginBloc, LoginState>(
       builder: (context, state) {
-        return SizedBox(
+        return Padding(
+        padding: const EdgeInsets.fromLTRB(60, 0, 60, 120),
+        child: SizedBox(
           width: double.infinity,
-          height: 50,
+          height: 45,
           child: state.isLoading
               ? const Center(child: CircularProgressIndicator())
               : ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF9924F),
+                    backgroundColor: const Color(0xFFFF9052),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
+                      borderRadius: BorderRadius.circular(24),
                     ),
                     elevation: 0,
                   ),
@@ -172,12 +187,13 @@ class _LoginButton extends StatelessWidget {
                           context.go('/dashboard');
                         }
                       : null,
-                  child: const Text(
+                  child: Text(
                     "Login",
-                    style: TextStyle(fontSize: 16),
+                    style: GoogleFonts.poppins(fontSize: 18),
                   ),
                 ),
-        );
+          ),
+        ); 
       },
     );
   }

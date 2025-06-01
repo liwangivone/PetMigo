@@ -19,18 +19,20 @@ class RegisterScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 32),
-                      const Center(
+                      const SizedBox(height: 60),
+                      Center(
                         child: Text(
                           "Create your account",
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                          style: GoogleFonts.poppins(
+                            fontSize: 28, 
+                            fontWeight: FontWeight.w600),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 40),
                       Center(
                         child: Image.asset(
                           'assets/images/petmigo_logo.png',
-                          height: 180,
+                          height: 240,
                         ),
                       ),
                       const SizedBox(height: 32),

@@ -72,12 +72,12 @@ class OnboardingScreen extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final data = onboardingData[index];
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 30),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Flexible(
-                                flex: 30,
+                                flex: 50,
                                 child: Center(
                                   child: Image.asset(
                                     data['image']!,
@@ -86,9 +86,9 @@ class OnboardingScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 5),
                               Flexible(
-                                flex: 10,
+                                flex: 15,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
@@ -121,13 +121,13 @@ class OnboardingScreen extends StatelessWidget {
                   ),
                   // Dot indicator
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
+                    padding: const EdgeInsets.only(bottom: 30),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(
                         onboardingData.length,
                         (index) => Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          margin: const EdgeInsets.symmetric(horizontal: 6),
                           height: 15,
                           width: 15,
                           decoration: BoxDecoration(
@@ -142,7 +142,7 @@ class OnboardingScreen extends StatelessWidget {
                   ),
                   // Next button
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 24.0),
+                    padding: const EdgeInsets.fromLTRB(60, 0, 60, 120),
                     child: SizedBox(
                       width: double.infinity,
                       height: 45,
@@ -158,8 +158,8 @@ class OnboardingScreen extends StatelessWidget {
                         child: Text(
                           "Next",
                           style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
+                            color: Colors.white, 
+                            fontWeight: FontWeight.w500, 
                             fontSize: 18,
                           ),
                         ),

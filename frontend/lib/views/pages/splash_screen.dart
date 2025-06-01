@@ -13,7 +13,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     // Ganti pushReplacementNamed dengan context.go()
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 4), () {
       try {
         context.go('/onboarding');
       } catch (e) {
@@ -31,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/images/petmigo_logo.png',
+              'assets/images/splash.gif',
               width: 360,
               errorBuilder: (context, error, stackTrace) {
                 debugPrint('Error memuat gambar: $error');
