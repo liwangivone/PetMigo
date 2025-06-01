@@ -35,18 +35,21 @@ public class PetScheduleController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<PetSchedule> updateSchedule(@PathVariable Long id, @RequestBody PetSchedule schedule) {
-        if (!id.equals(schedule.getSchedule_id())) {
-            return ResponseEntity.badRequest().build();
-        }
-        try {
-            PetSchedule updated = service.updateSchedule(schedule);
-            return ResponseEntity.ok(updated);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+@PutMapping("/schedules/{scheduleId}")
+public ResponseEntity<PetSchedule> updateSchedule(
+        @PathVariable Long scheduleId,
+        @RequestBody PetSchedule schedule) {
+    try {
+        PetSchedule updated = service.updateSchedule(scheduleId, schedule);
+        return ResponseEntity.ok(updated);
+    } catch (RuntimeException e) {
+        return ResponseEntity.badRequest().body(null);
     }
+}
+
+
+
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSchedule(@PathVariable Long id) {

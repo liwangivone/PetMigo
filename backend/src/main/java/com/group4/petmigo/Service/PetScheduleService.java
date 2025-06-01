@@ -32,11 +32,19 @@ public class PetScheduleService {
         return scheduleRepository.findById(id);
     }
 
-    public PetSchedule updateSchedule(PetSchedule schedule) {
-        if (!scheduleRepository.existsById(schedule.getSchedule_id())) {
-            throw new RuntimeException("Schedule not found with id " + schedule.getSchedule_id());
-        }
-        return scheduleRepository.save(schedule);
+    public PetSchedule updateSchedule(Long schedule_id, PetSchedule schedule) {
+        PetSchedule existing = scheduleRepository.findById(schedule_id)
+            .orElseThrow(() -> new RuntimeException("Schedule not found with id " + schedule_id));
+
+        // Update field yang diizinkan saja
+        existing.setDescription(schedule.getDescription());
+        existing.setDate(schedule.getDate());
+        existing.setExpense(schedule.getExpense());
+        // Tambahkan field lain yang perlu diupdate jika ada
+
+        // Jangan ubah existing.setPet() supaya relasi ke pet tetap aman
+
+        return scheduleRepository.save(existing);
     }
 
     public void deleteSchedule(Long id) {
