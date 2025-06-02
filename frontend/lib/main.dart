@@ -58,14 +58,21 @@ class MyApp extends StatelessWidget {
           builder: (context, state) => const MyExpensesPage(),
         ),
         GoRoute(
-              path: '/need-vet',
-              builder: (context, state) => VetListPage(),
-            ),
+            path: '/need-vet',
+            builder: (context, state) => VetListPage(),
+          ),
         GoRoute(
           path: '/detail-vet',
           builder: (context, state) {
             final vet = state.extra as VetModel;
             return VetDetailPage(vet: vet);
+          },
+        ),
+        GoRoute(
+          path: '/chat-vet',
+          builder: (context, state) {
+            final vet = state.extra as VetModel;
+            return ChatPage(vet: vet);
           },
         ),
       ],

@@ -11,10 +11,11 @@ import 'package:frontend/bloc/onboarding_bloc.dart';
 import 'package:frontend/bloc/regist_bloc.dart';
 import 'package:frontend/bloc/profile_bloc.dart';
 import 'dart:async';
-
+import 'package:frontend/bloc/vet_chat_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:frontend/bloc/vet_chat_bloc.dart';
 
 import 'package:frontend/bloc/my_expenses_bloc/expenses_bloc.dart';
 import 'package:frontend/bloc/my_expenses_bloc/expenses_state.dart';
@@ -38,5 +39,6 @@ part 'my_expenses_page.dart';
 part 'bottom_navbar.dart';
 part 'add_new_pet.dart';
 part 'vet_detail_page.dart';
+part 'vet_chat_page.dart';
 
 

@@ -185,27 +185,28 @@ class VetDetailPage extends StatelessWidget {
             height: 50,
             child: ElevatedButton(
               onPressed: () {
-                // Handle start chat
+              // Navigasi ke halaman VetChatPage menggunakan go_router
+              context.go('/chat-vet', extra: vet);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF7A3D),
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
-                ),
+              backgroundColor: const Color(0xFFFF7A3D),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
+              ),
               ),
               child: const Text(
-                'Start chat',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+              'Start chat',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
               ),
+              ),
+            ),
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
