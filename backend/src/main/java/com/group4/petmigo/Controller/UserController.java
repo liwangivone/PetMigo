@@ -71,4 +71,11 @@ public class UserController {
 
         return userService.updateProfile(id, updatedData);
     }
+
+    // Endpoint untuk mendapatkan profile user by ID
+    @GetMapping("/profiles/{id}")
+    public ResponseEntity<User> getUserProfile(@PathVariable("id") Long userId) {
+        User userProfile = userService.getUserProfileById(userId);
+        return ResponseEntity.ok(userProfile);
+    }
 }
