@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/bloc/my_expenses_bloc/expenses_bloc.dart';
 import 'views/pages/pages.dart';
+import 'package:frontend/models/vet_models.dart';
 import 'package:go_router/go_router.dart';
 
 void main() {
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final GoRouter router = GoRouter(
-      initialLocation: '/onboarding',
+      initialLocation: '/need-vet',
       routes: [
         GoRoute(
           path: '/',
@@ -55,6 +56,24 @@ class MyApp extends StatelessWidget {
         GoRoute(
           path: '/myexpenses', 
           builder: (context, state) => const MyExpensesPage(),
+        ),
+        GoRoute(
+            path: '/need-vet',
+            builder: (context, state) => VetListPage(),
+          ),
+        GoRoute(
+          path: '/detail-vet',
+          builder: (context, state) {
+            final vet = state.extra as VetModel;
+            return VetDetailPage(vet: vet);
+          },
+        ),
+        GoRoute(
+          path: '/chat-vet',
+          builder: (context, state) {
+            final vet = state.extra as VetModel;
+            return ChatPage(vet: vet);
+          },
         ),
       ],
     );
