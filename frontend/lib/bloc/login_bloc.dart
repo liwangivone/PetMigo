@@ -1,72 +1,95 @@
-// login_bloc.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:frontend/models/model_login.dart';
-import 'package:http/http.dart' as http;
+import '../models/user_model.dart';
+import '../repository/auth_repository.dart';
 
 abstract class LoginEvent {}
-
 class EmailChanged extends LoginEvent {
   final String email;
   EmailChanged(this.email);
 }
-
 class PasswordChanged extends LoginEvent {
   final String password;
   PasswordChanged(this.password);
 }
-
 class LoginSubmitted extends LoginEvent {}
 
+class LoginState {
+  final String email;
+  final String password;
+  final bool isLoading;
+  final bool isSuccess;
+  final String? errorMessage;
+  final User? user;
+  final bool submitted;
+  bool get isValid => email.isNotEmpty && password.isNotEmpty && email.contains('@');
+  const LoginState({
+    this.email = '',
+    this.password = '',
+    this.isLoading = false,
+    this.isSuccess = false,
+    this.errorMessage,
+    this.user,
+    this.submitted = false,
+  });
+  LoginState copyWith({
+    String? email,
+    String? password,
+    bool? isLoading,
+    bool? isSuccess,
+    String? errorMessage,
+    User? user,
+    bool? submitted,
+  }) {
+    return LoginState(
+      email: email ?? this.email,
+      password: password ?? this.password,
+      isLoading: isLoading ?? this.isLoading,
+      isSuccess: isSuccess ?? this.isSuccess,
+      errorMessage: errorMessage,
+      user: user ?? this.user,
+      submitted: submitted ?? this.submitted,
+    );
+  }
+}
+
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
-  LoginBloc() : super(LoginState()) {
+  final AuthRepository authRepository;
+  LoginBloc({required this.authRepository}) : super(const LoginState()) {
     on<EmailChanged>((event, emit) {
-      emit(state.copyWith(
-        email: event.email,
-        errorMessage: null,
-      ));
+      emit(state.copyWith(email: event.email, errorMessage: null, isSuccess: false));
     });
-
     on<PasswordChanged>((event, emit) {
-      emit(state.copyWith(
-        password: event.password,
-        errorMessage: null,
-      ));
+      emit(state.copyWith(password: event.password, errorMessage: null, isSuccess: false));
     });
-
-      on<LoginSubmitted>((event, emit) async {
-        if (!state.isValid) return;
-
-        emit(state.copyWith(isLoading: true, errorMessage: null));
-        
-        try {
-          final response = await http.post(
-            Uri.parse('http://localhost:8080/api/users/login'),
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            body: {
-              'email': state.email,
-              'password': state.password,
-            },
-          );
-
-          if (response.statusCode == 200) {
-            print('Login berhasil');
-            print('Response body: ${response.body}');
-            emit(state.copyWith(
-              isLoading: false,
-              isSuccess: true, // Set success ke true
-            ));
-          } else {
-            emit(state.copyWith(
-              isLoading: false,
-              errorMessage: 'Email atau password salah',
-            ));
-          }
-        } catch (e) {
-          emit(state.copyWith(
-            isLoading: false,
-            errorMessage: 'Terjadi kesalahan. Silakan coba lagi.',
-          ));
+    on<LoginSubmitted>((event, emit) async {
+      emit(state.copyWith(submitted: true));
+      if (state.email.isEmpty || state.password.isEmpty) {
+        emit(state.copyWith(
+          errorMessage: "Email dan password wajib diisi",
+          isSuccess: false,
+        ));
+        return;
+      }
+      if (!state.email.contains('@')) {
+        emit(state.copyWith(
+          errorMessage: "Email tidak valid",
+          isSuccess: false,
+        ));
+        return;
+      }
+      emit(state.copyWith(isLoading: true, errorMessage: null, isSuccess: false));
+      try {
+        final user = await authRepository.login(state.email, state.password);
+        emit(state.copyWith(isLoading: false, isSuccess: true, user: user, errorMessage: null));
+      } catch (e) {
+        String msg = e.toString();
+        if (msg.contains("email atau password salah")) {
+          msg = "Email atau password salah";
+        } else if (msg.contains("Exception:")) {
+          msg = msg.replaceFirst("Exception:", "").trim();
         }
-      });
+        emit(state.copyWith(isLoading: false, isSuccess: false, errorMessage: msg));
+      }
+    });
   }
 }

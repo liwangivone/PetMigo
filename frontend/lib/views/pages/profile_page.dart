@@ -1,12 +1,17 @@
 part of 'pages.dart';
 
+// ProfilePage: Fetch user dari backend via BLoC
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // TODO: Ganti dengan userId dari session/auth state
+    final userId = '1';
+
     return BlocProvider(
-      create: (context) => UserBloc()..add(const LoadUser()),
+      create: (context) => UserBloc(userRepository: UserRepository(userService: UserService()))
+        ..add(LoadUser(userId: userId)),
       child: const ProfileView(),
     );
   }
@@ -72,7 +77,9 @@ class ProfileView extends StatelessWidget {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      context.read<UserBloc>().add(const LoadUser());
+                      // Ambil userId dari session/auth state
+                      final userId = '1';
+                      context.read<UserBloc>().add(LoadUser(userId: userId));
                     },
                     child: const Text('Retry'),
                   ),
@@ -309,13 +316,18 @@ class ProfileContent extends StatelessWidget {
   }
 }
 
+// EditProfilePage: Fetch user dari backend via BLoC
 class EditProfilePage extends StatelessWidget {
   const EditProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // TODO: Ganti dengan userId dari session/auth state
+    final userId = '1';
+
     return BlocProvider(
-      create: (context) => UserBloc()..add(const LoadUser()),
+      create: (context) => UserBloc(userRepository: UserRepository(userService: UserService()))
+        ..add(LoadUser(userId: userId)),
       child: const EditProfileView(),
     );
   }
@@ -441,7 +453,9 @@ class _EditProfileViewState extends State<EditProfileView> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      context.read<UserBloc>().add(const LoadUser());
+                      // Ambil userId dari session/auth state
+                      final userId = '1';
+                      context.read<UserBloc>().add(LoadUser(userId: userId));
                     },
                     child: const Text('Retry'),
                   ),
@@ -486,7 +500,6 @@ class _EditProfileViewState extends State<EditProfileView> {
 
   void _saveProfile() {
     final userBloc = context.read<UserBloc>();
-    
     if (currentUser == null) return;
 
     final updatedUser = currentUser!.copyWith(
