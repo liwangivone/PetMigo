@@ -1,43 +1,21 @@
 import 'package:equatable/equatable.dart';
 import 'package:frontend/models/user_model.dart';
-import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/repository/user_repository.dart';
 
 class UserBloc extends Bloc<UserEvent, UserState> {
-  UserBloc() : super(const UserInitial()) {
+  final UserRepository userRepository;
+  UserBloc({required this.userRepository}) : super(const UserInitial()) {
     on<LoadUser>(_onLoadUser);
     on<UpdateUser>(_onUpdateUser);
-    on<UpdateUserName>(_onUpdateUserName);
-    on<UpdateUserEmail>(_onUpdateUserEmail);
-    on<UpdateUserPhone>(_onUpdateUserPhone);
-    on<UpdateUserDateOfBirth>(_onUpdateUserDateOfBirth);
     on<UpdateUserProfileImage>(_onUpdateUserProfileImage);
     on<LogoutUser>(_onLogoutUser);
   }
 
-  // Hardcoded user data - replace with actual data source later
-  User _getHardcodedUser() {
-    return const User(
-      id: '#13237',
-      name: 'Ivone Liwang',
-      email: 'liwangivone@gmail.com',
-      phone: '+62-895-1697-3495',
-      dateOfBirth: null,
-      profileImageUrl: null,
-      isPremium: false,
-    );
-  }
-
   Future<void> _onLoadUser(LoadUser event, Emitter<UserState> emit) async {
     emit(const UserLoading());
-    
     try {
-      // Simulate loading delay
-      await Future.delayed(const Duration(milliseconds: 500));
-      
-      // Get hardcoded user data
-      final user = _getHardcodedUser();
-      
+      final user = await userRepository.fetchUserProfile(event.userId);
       emit(UserLoaded(user: user));
     } catch (e) {
       emit(UserError(message: 'Failed to load user: ${e.toString()}'));
@@ -48,73 +26,14 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     if (state is UserLoaded) {
       final currentUser = (state as UserLoaded).user;
       emit(UserUpdating(user: currentUser));
-      
       try {
-        // Simulate update delay
-        await Future.delayed(const Duration(milliseconds: 800));
-        
-        // Validate user data
-        if (event.user.name.isEmpty) {
-          emit(UserError(
-            message: 'Name cannot be empty',
-            user: currentUser,
-          ));
-          return;
-        }
-        
-        if (event.user.email.isEmpty || !event.user.email.contains('@')) {
-          emit(UserError(
-            message: 'Please enter a valid email',
-            user: currentUser,
-          ));
-          return;
-        }
-        
-        // Simulate successful update
-        emit(UserUpdateSuccess(user: event.user));
-        
-        // Transition back to loaded state
+        final updatedUser = await userRepository.updateUserProfile(event.user);
+        emit(UserUpdateSuccess(user: updatedUser));
         await Future.delayed(const Duration(milliseconds: 100));
-        emit(UserLoaded(user: event.user));
-        
+        emit(UserLoaded(user: updatedUser));
       } catch (e) {
-        emit(UserError(
-          message: 'Failed to update user: ${e.toString()}',
-          user: currentUser,
-        ));
+        emit(UserError(message: 'Failed to update user: ${e.toString()}', user: currentUser));
       }
-    }
-  }
-
-  Future<void> _onUpdateUserName(UpdateUserName event, Emitter<UserState> emit) async {
-    if (state is UserLoaded) {
-      final currentUser = (state as UserLoaded).user;
-      final updatedUser = currentUser.copyWith(name: event.name);
-      add(UpdateUser(user: updatedUser));
-    }
-  }
-
-  Future<void> _onUpdateUserEmail(UpdateUserEmail event, Emitter<UserState> emit) async {
-    if (state is UserLoaded) {
-      final currentUser = (state as UserLoaded).user;
-      final updatedUser = currentUser.copyWith(email: event.email);
-      add(UpdateUser(user: updatedUser));
-    }
-  }
-
-  Future<void> _onUpdateUserPhone(UpdateUserPhone event, Emitter<UserState> emit) async {
-    if (state is UserLoaded) {
-      final currentUser = (state as UserLoaded).user;
-      final updatedUser = currentUser.copyWith(phone: event.phone);
-      add(UpdateUser(user: updatedUser));
-    }
-  }
-
-  Future<void> _onUpdateUserDateOfBirth(UpdateUserDateOfBirth event, Emitter<UserState> emit) async {
-    if (state is UserLoaded) {
-      final currentUser = (state as UserLoaded).user;
-      final updatedUser = currentUser.copyWith(dateOfBirth: event.dateOfBirth);
-      add(UpdateUser(user: updatedUser));
     }
   }
 
@@ -122,36 +41,21 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     if (state is UserLoaded) {
       final currentUser = (state as UserLoaded).user;
       emit(UserUpdating(user: currentUser));
-      
       try {
-        // Simulate image upload delay
-        await Future.delayed(const Duration(seconds: 1));
-        
-        final updatedUser = currentUser.copyWith(profileImageUrl: event.imagePath);
-        emit(UserUpdateSuccess(
-          user: updatedUser,
-          message: 'Profile image updated successfully',
-        ));
-        
+        final updatedUser = await userRepository.updateProfileImage(currentUser.id, event.imagePath);
+        emit(UserUpdateSuccess(user: updatedUser, message: 'Profile image updated successfully'));
         await Future.delayed(const Duration(milliseconds: 100));
         emit(UserLoaded(user: updatedUser));
-        
       } catch (e) {
-        emit(UserError(
-          message: 'Failed to update profile image: ${e.toString()}',
-          user: currentUser,
-        ));
+        emit(UserError(message: 'Failed to update profile image: ${e.toString()}', user: currentUser));
       }
     }
   }
 
   Future<void> _onLogoutUser(LogoutUser event, Emitter<UserState> emit) async {
     emit(const UserLoading());
-    
     try {
-      // Simulate logout delay
-      await Future.delayed(const Duration(milliseconds: 500));
-      
+      await userRepository.logout();
       emit(const UserLoggedOut());
     } catch (e) {
       emit(UserError(message: 'Failed to logout: ${e.toString()}'));
@@ -231,7 +135,10 @@ abstract class UserEvent extends Equatable {
 }
 
 class LoadUser extends UserEvent {
-  const LoadUser();
+  final String userId;
+  const LoadUser({required this.userId});
+  @override
+  List<Object?> get props => [userId];
 }
 
 class UpdateUser extends UserEvent {
@@ -241,42 +148,6 @@ class UpdateUser extends UserEvent {
 
   @override
   List<Object?> get props => [user];
-}
-
-class UpdateUserName extends UserEvent {
-  final String name;
-
-  const UpdateUserName({required this.name});
-
-  @override
-  List<Object?> get props => [name];
-}
-
-class UpdateUserEmail extends UserEvent {
-  final String email;
-
-  const UpdateUserEmail({required this.email});
-
-  @override
-  List<Object?> get props => [email];
-}
-
-class UpdateUserPhone extends UserEvent {
-  final String phone;
-
-  const UpdateUserPhone({required this.phone});
-
-  @override
-  List<Object?> get props => [phone];
-}
-
-class UpdateUserDateOfBirth extends UserEvent {
-  final String dateOfBirth;
-
-  const UpdateUserDateOfBirth({required this.dateOfBirth});
-
-  @override
-  List<Object?> get props => [dateOfBirth];
 }
 
 class UpdateUserProfileImage extends UserEvent {

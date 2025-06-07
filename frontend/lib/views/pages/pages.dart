@@ -1,6 +1,5 @@
 //Model
 import 'package:flutter/services.dart';
-import 'package:frontend/models/model_login.dart';
 import 'package:frontend/models/user_model.dart';
 import 'package:frontend/models/expenses_model.dart';
 import 'package:frontend/models/vet_models.dart';
@@ -15,7 +14,6 @@ import 'package:frontend/bloc/vet_chat_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:frontend/bloc/vet_chat_bloc.dart';
 
 import 'package:frontend/bloc/my_expenses_bloc/expenses_bloc.dart';
 import 'package:frontend/bloc/my_expenses_bloc/expenses_state.dart';
@@ -24,6 +22,15 @@ import 'package:frontend/bloc/my_expenses_bloc/expenses_event.dart';
 //Dll
 import 'package:pie_chart/pie_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+//services
+import 'package:frontend/services/user_auth_service.dart';
+import 'package:frontend/services/auth_services.dart';
+import 'package:frontend/services/user_service.dart';
+
+//repository
+import 'package:frontend/repository/auth_repository.dart';
+import 'package:frontend/repository/user_repository.dart';
 
 //Tampilan
 part 'vets_list_page.dart';

@@ -8,11 +8,10 @@ class LoginScreen extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return BlocProvider(
-      create: (_) => LoginBloc(),
+      create: (_) => LoginBloc(authRepository: AuthRepository()),
       child: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) {
-          if (state.isSuccess) {
-            // Navigasi ke halaman dashboard ketika login sukses
+          if (state.isSuccess && state.user != null) {
             context.go('/dashboard');
           }
         },
@@ -39,8 +38,6 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Input dan tombol login
                   Expanded(
                     flex: 4,
                     child: Column(
@@ -91,9 +88,11 @@ class _EmailInput extends StatelessWidget {
             labelText: 'Email',
             hintText: 'Example@example.com',
             border: const UnderlineInputBorder(),
-            errorText: state.errorMessage != null && state.email.isEmpty
+            errorText: state.submitted && state.email.isEmpty
                 ? 'Email tidak boleh kosong'
-                : null,
+                : (state.submitted && state.email.isNotEmpty && !state.isValidEmail
+                    ? 'Format email tidak valid'
+                    : null),
           ),
           onChanged: (value) =>
               context.read<LoginBloc>().add(EmailChanged(value)),
@@ -113,9 +112,11 @@ class _PasswordInput extends StatelessWidget {
           decoration: InputDecoration(
             labelText: 'Password',
             border: const UnderlineInputBorder(),
-            errorText: state.errorMessage != null && state.password.isEmpty
+            errorText: state.submitted && state.password.isEmpty
                 ? 'Password tidak boleh kosong'
-                : null,
+                : (state.submitted && state.password.isNotEmpty && state.password.length < 6
+                    ? 'Password minimal 6 karakter'
+                    : null),
           ),
           onChanged: (value) =>
               context.read<LoginBloc>().add(PasswordChanged(value)),
@@ -130,14 +131,15 @@ class _ErrorMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<LoginBloc, LoginState>(
       builder: (context, state) {
-        if (state.errorMessage != null && 
-            state.email.isNotEmpty && 
-            state.password.isNotEmpty) {
-          return Text(
-            state.errorMessage!,
-            style: const TextStyle(
-              color: Colors.red,
-              fontSize: 14,
+        if (state.errorMessage != null && state.errorMessage!.isNotEmpty) {
+          return Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              state.errorMessage!,
+              style: const TextStyle(
+                color: Colors.red,
+                fontSize: 14,
+              ),
             ),
           );
         }
@@ -166,10 +168,9 @@ class _LoginButton extends StatelessWidget {
                     ),
                     elevation: 0,
                   ),
-                  onPressed: state.isValid
+                  onPressed: !state.isLoading
                       ? () {
                           context.read<LoginBloc>().add(LoginSubmitted());
-                          context.go('/dashboard');
                         }
                       : null,
                   child: const Text(
