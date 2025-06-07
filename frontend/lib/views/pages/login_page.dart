@@ -88,10 +88,10 @@ class _EmailInput extends StatelessWidget {
             labelText: 'Email',
             hintText: 'Example@example.com',
             border: const UnderlineInputBorder(),
-            errorText: state.email.isEmpty && state.submitted
+            errorText: state.submitted && state.email.isEmpty
                 ? 'Email tidak boleh kosong'
-                : (!state.email.contains('@') && state.submitted
-                    ? 'Email tidak valid'
+                : (state.submitted && state.email.isNotEmpty && !state.isValidEmail
+                    ? 'Format email tidak valid'
                     : null),
           ),
           onChanged: (value) =>
@@ -112,9 +112,11 @@ class _PasswordInput extends StatelessWidget {
           decoration: InputDecoration(
             labelText: 'Password',
             border: const UnderlineInputBorder(),
-            errorText: state.password.isEmpty && state.submitted
+            errorText: state.submitted && state.password.isEmpty
                 ? 'Password tidak boleh kosong'
-                : null,
+                : (state.submitted && state.password.isNotEmpty && state.password.length < 6
+                    ? 'Password minimal 6 karakter'
+                    : null),
           ),
           onChanged: (value) =>
               context.read<LoginBloc>().add(PasswordChanged(value)),

@@ -2,15 +2,38 @@ part of 'pages.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => RegisterBloc(authRepository: AuthRepository()),
+      create: (context) => RegisterBloc(
+        authRepository: AuthRepository(),
+      ),
       child: BlocListener<RegisterBloc, RegisterState>(
         listener: (context, state) {
-          if (state.status == RegisterStatus.success) {
+          if (state.status == RegisterStatus.success && state.user != null) {
+            // Show success message
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Akun berhasil dibuat. Selamat datang, ${state.user!.name}!'),
+                backgroundColor: Colors.green,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+            // Navigate to dashboard
             context.go('/dashboard');
+          } else if (state.status == RegisterStatus.failure && state.errorMessage != null) {
+            // Show error message in snackbar for important errors
+            if (state.errorMessage!.contains('server') || 
+                state.errorMessage!.contains('koneksi') ||
+                state.errorMessage!.contains('terduga')) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errorMessage!),
+                  backgroundColor: Colors.red,
+                  duration: const Duration(seconds: 4),
+                ),
+              );
+            }
           }
         },
         child: Scaffold(
@@ -39,15 +62,16 @@ class RegisterScreen extends StatelessWidget {
                             height: 180,
                           ),
                         ),
-                        const SizedBox(height: 32),
-                        const Text("Full name *"),
+                        const SizedBox(height: 32),                        const Text("Full name *"),
                         TextField(
                           onChanged: (val) => bloc.add(RegisterNameChanged(val)),
                           decoration: InputDecoration(
                             hintText: "Enter your full name",
-                            errorText: state.submitted && state.name.isEmpty
-                                ? "Nama tidak boleh kosong"
-                                : null,
+                            errorText: state.submitted && state.name.isEmpty 
+                              ? "Nama tidak boleh kosong"
+                              : (state.submitted && state.name.trim().length < 2 
+                                ? "Nama minimal 2 karakter"
+                                : null),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -57,11 +81,11 @@ class RegisterScreen extends StatelessWidget {
                           onChanged: (val) => bloc.add(RegisterEmailChanged(val)),
                           decoration: InputDecoration(
                             hintText: "example@example.com",
-                            errorText: state.submitted && state.email.isEmpty
-                                ? "Email tidak boleh kosong"
-                                : (state.submitted && !state.email.contains('@')
-                                    ? "Email tidak valid"
-                                    : null),
+                            errorText: state.submitted && state.email.isEmpty 
+                              ? "Email tidak boleh kosong"
+                              : (state.submitted && state.email.isNotEmpty && !state.isValidEmail 
+                                ? "Format email tidak valid"
+                                : null),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -71,11 +95,16 @@ class RegisterScreen extends StatelessWidget {
                           onChanged: (val) => bloc.add(RegisterPasswordChanged(val)),
                           decoration: InputDecoration(
                             hintText: "********",
-                            errorText: state.submitted && state.password.isEmpty
-                                ? "Password tidak boleh kosong"
-                                : (state.submitted && state.password.length < 6
-                                    ? "Password minimal 6 karakter"
-                                    : null),
+                            errorText: state.submitted && state.password.isEmpty 
+                              ? "Password tidak boleh kosong"
+                              : (state.submitted && state.password.isNotEmpty && state.password.length < 6 
+                                ? "Password minimal 6 karakter"
+                                : null),
+                            helperText: "Password minimal 6 karakter",
+                            helperStyle: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 12,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -85,8 +114,11 @@ class RegisterScreen extends StatelessWidget {
                               value: state.agreed,
                               onChanged: (_) => bloc.add(RegisterTermsToggled()),
                             ),
-                            const Expanded(
-                              child: Text("I have read and agreed to the"),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () => bloc.add(RegisterTermsToggled()),
+                                child: const Text("I have read and agreed to the Terms & Conditions"),
+                              ),
                             ),
                           ],
                         ),
@@ -98,12 +130,32 @@ class RegisterScreen extends StatelessWidget {
                               style: TextStyle(color: Colors.red, fontSize: 12),
                             ),
                           ),
-                        if (state.errorMessage != null && state.errorMessage!.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Text(
-                              state.errorMessage!,
-                              style: const TextStyle(color: Colors.red, fontSize: 14),
+                        if (state.status == RegisterStatus.failure && 
+                            state.errorMessage != null && 
+                            state.errorMessage!.isNotEmpty)
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade50,
+                              border: Border.all(color: Colors.red.shade200),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    state.errorMessage!,
+                                    style: TextStyle(
+                                      color: Colors.red.shade700,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         const SizedBox(height: 24),
@@ -117,14 +169,24 @@ class RegisterScreen extends StatelessWidget {
                               ),
                               padding: const EdgeInsets.symmetric(vertical: 16),
                             ),
-                            onPressed: !state.isLoading
-                                ? () {
+                            onPressed: state.status == RegisterStatus.loading
+                                ? null
+                                : () {
                                     context.read<RegisterBloc>().add(RegisterSubmitted());
-                                  }
-                                : null,
-                            child: state.isLoading
-                                ? const CircularProgressIndicator()
-                                : const Text("Create account", style: TextStyle(color: Colors.white)),
+                                  },
+                            child: state.status == RegisterStatus.loading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    ),
+                                  )
+                                : const Text(
+                                    "Create account", 
+                                    style: TextStyle(color: Colors.white, fontSize: 16),
+                                  ),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -137,7 +199,8 @@ class RegisterScreen extends StatelessWidget {
                               child: const Text("Login", style: TextStyle(color: Colors.blue)),
                             )
                           ],
-                        )
+                        ),
+                        const SizedBox(height: 32),
                       ],
                     ),
                   );
