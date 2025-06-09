@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 
 class AuthServices {
@@ -13,11 +14,19 @@ class AuthServices {
         Uri.parse('$baseUrl/login'),
         body: {'email': email, 'password': password},
       ).timeout(timeout);
-      
+
       if (response.statusCode == 200) {
         try {
           final data = json.decode(response.body);
-          return User.fromJson(data);
+          final user = User.fromJson(data);
+
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('userid', user.id.toString());
+          await prefs.setString('name', user.name);
+          await prefs.setString('email', user.email);
+          await prefs.setString('phonenumber', user.phone ?? '');
+
+          return user;
         } catch (e) {
           throw Exception('Format respons tidak valid dari server');
         }
@@ -42,7 +51,7 @@ class AuthServices {
         Uri.parse('$baseUrl/register'),
         body: {'name': name, 'email': email, 'password': password},
       ).timeout(timeout);
-      
+
       if (response.statusCode == 200) {
         try {
           final data = json.decode(response.body);
@@ -73,11 +82,9 @@ class AuthServices {
       }
       return response.body.isNotEmpty ? response.body : 'Terjadi kesalahan pada server';
     } catch (_) {
-      // Jika tidak bisa parse JSON, return raw response
       if (response.body.isNotEmpty) {
         return response.body;
       }
-      // Return status code based error message
       switch (response.statusCode) {
         case 400:
           return 'Data yang dikirim tidak valid';

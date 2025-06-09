@@ -23,4 +23,5 @@ class UserRepository {
   Future<void> logout() async {
     await userService.logout();
   }
+
 }

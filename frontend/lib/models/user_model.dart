@@ -2,8 +2,8 @@ class User {
   final String id;
   final String name;
   final String email;
+  final String password;
   final String phone;
-  final String? dateOfBirth;
   final String? profileImageUrl;
   final bool isPremium;
 
@@ -12,7 +12,7 @@ class User {
     required this.name,
     required this.email,
     required this.phone,
-    this.dateOfBirth,
+    required this.password,
     this.profileImageUrl,
     this.isPremium = false,
   });
@@ -23,7 +23,7 @@ class User {
       name: json['name'] ?? '',
       email: json['email'] ?? '',
       phone: json['phonenumber'] ?? '',
-      dateOfBirth: json['dateOfBirth'],
+      password: json['password'] ?? '',
       profileImageUrl: json['profileImageUrl'],
       isPremium: json['isPremium'] ?? false,
     );
@@ -34,8 +34,8 @@ class User {
     String? name,
     String? email,
     String? phone,
-    String? dateOfBirth,
     String? profileImageUrl,
+    String? password,
     bool? isPremium,
   }) {
     return User(
@@ -43,7 +43,7 @@ class User {
       name: name ?? this.name,
       email: email ?? this.email,
       phone: phone ?? this.phone,
-      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      password: password ?? this.password,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       isPremium: isPremium ?? this.isPremium,
     );

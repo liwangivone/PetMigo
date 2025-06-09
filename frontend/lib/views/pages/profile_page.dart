@@ -1,18 +1,43 @@
 part of 'pages.dart';
 
-// ProfilePage: Fetch user dari backend via BLoC
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
+  // Ambil userId dari SharedPreferences dengan key 'userid'
+  Future<String?> _getUserIdFromLocalStorage() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userid'); // key harus sama dengan yang dipakai waktu simpan
+  }
+
   @override
   Widget build(BuildContext context) {
-    // TODO: Ganti dengan userId dari session/auth state
-    final userId = '1';
+    return FutureBuilder<String?>(
+      future: _getUserIdFromLocalStorage(),
+      builder: (context, snapshot) {
+        // Tampilkan loading dulu kalau data belum siap
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-    return BlocProvider(
-      create: (context) => UserBloc(userRepository: UserRepository(userService: UserService()))
-        ..add(LoadUser(userId: userId)),
-      child: const ProfileView(),
+        // Kalau data tidak ada atau null, tampilkan pesan error
+        if (!snapshot.hasData || snapshot.data == null) {
+          return const Scaffold(
+            body: Center(child: Text('User ID not found. Please login again.')),
+          );
+        }
+
+        final userId = snapshot.data!;
+
+        // Pakai BlocProvider untuk load user dengan userId yang didapat
+        return BlocProvider(
+          create: (context) => UserBloc(
+            userRepository: UserRepository(userService: UserService()),
+          )..add(LoadUser(userId: userId)),
+          child: const ProfileView(),
+        );
+      },
     );
   }
 }
@@ -77,7 +102,6 @@ class ProfileView extends StatelessWidget {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      // Ambil userId dari session/auth state
                       final userId = '1';
                       context.read<UserBloc>().add(LoadUser(userId: userId));
                     },
@@ -96,7 +120,7 @@ class ProfileView extends StatelessWidget {
           }
 
           if (user == null) {
-            return const Center(child: Text('No user data available'));
+            return const Center(child: Text(''));
           }
 
           return ProfileContent(user: user);
@@ -115,7 +139,6 @@ class ProfileContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Header with profile picture
         Container(
           decoration: const BoxDecoration(
             color: Color(0xFFFF9B58),
@@ -127,7 +150,6 @@ class ProfileContent extends StatelessWidget {
           child: Center(
             child: Column(
               children: [
-                // Profile picture with camera icon
                 Stack(
                   children: [
                     CircleAvatar(
@@ -175,10 +197,7 @@ class ProfileContent extends StatelessWidget {
             ),
           ),
         ),
-
         const SizedBox(height: 16),
-
-        // Contact information card
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Card(
@@ -211,26 +230,12 @@ class ProfileContent extends StatelessWidget {
                     minLeadingWidth: 24,
                     dense: true,
                   ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.calendar_today, color: Colors.deepOrange),
-                    title: Text(
-                      user.dateOfBirth ?? 'Not set',
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                    minLeadingWidth: 24,
-                    dense: true,
-                  ),
                 ],
               ),
             ),
           ),
         ),
-
         const SizedBox(height: 16),
-
-        // Subscription status
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
@@ -297,14 +302,14 @@ class ProfileContent extends StatelessWidget {
             ],
           ),
         ),
-
         const Spacer(),
-
-        // Logout button
         Padding(
           padding: const EdgeInsets.only(bottom: 20),
           child: TextButton.icon(
-            onPressed: () {
+            onPressed: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.clear(); // Hapus semua data di SharedPreferences
+
               context.read<UserBloc>().add(const LogoutUser());
             },
             icon: const Icon(Icons.logout, color: Colors.red),
@@ -320,15 +325,37 @@ class ProfileContent extends StatelessWidget {
 class EditProfilePage extends StatelessWidget {
   const EditProfilePage({super.key});
 
+  Future<String?> _getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userid'); // ambil userId dari local storage
+  }
+
   @override
   Widget build(BuildContext context) {
-    // TODO: Ganti dengan userId dari session/auth state
-    final userId = '1';
+    return FutureBuilder<String?>(
+      future: _getUserId(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-    return BlocProvider(
-      create: (context) => UserBloc(userRepository: UserRepository(userService: UserService()))
-        ..add(LoadUser(userId: userId)),
-      child: const EditProfileView(),
+        if (!snapshot.hasData || snapshot.data == null) {
+          return const Scaffold(
+            body: Center(child: Text('User not logged in')),
+          );
+        }
+
+        final userId = snapshot.data!;
+
+        return BlocProvider(
+          create: (context) =>
+              UserBloc(userRepository: UserRepository(userService: UserService()))
+                ..add(LoadUser(userId: userId)),
+          child: const EditProfileView(),
+        );
+      },
     );
   }
 }
@@ -344,7 +371,7 @@ class _EditProfileViewState extends State<EditProfileView> {
   late TextEditingController nameController;
   late TextEditingController phoneController;
   late TextEditingController emailController;
-  String? selectedDate;
+  late TextEditingController passwordController;
   User? currentUser;
 
   @override
@@ -353,6 +380,7 @@ class _EditProfileViewState extends State<EditProfileView> {
     nameController = TextEditingController();
     phoneController = TextEditingController();
     emailController = TextEditingController();
+    passwordController = TextEditingController();
   }
 
   @override
@@ -360,6 +388,7 @@ class _EditProfileViewState extends State<EditProfileView> {
     nameController.dispose();
     phoneController.dispose();
     emailController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
@@ -368,7 +397,7 @@ class _EditProfileViewState extends State<EditProfileView> {
       nameController.text = user.name;
       phoneController.text = user.phone;
       emailController.text = user.email;
-      selectedDate = user.dateOfBirth;
+      passwordController.text = user.password ?? '';
       currentUser = user;
     }
   }
@@ -382,9 +411,7 @@ class _EditProfileViewState extends State<EditProfileView> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            context.go('/profile');
-          },
+          onPressed: () => context.go('/profile'),
         ),
         actions: [
           BlocBuilder<UserBloc, UserState>(
@@ -402,10 +429,7 @@ class _EditProfileViewState extends State<EditProfileView> {
                       )
                     : const Text(
                         'Save',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
               );
             },
@@ -413,31 +437,27 @@ class _EditProfileViewState extends State<EditProfileView> {
         ],
       ),
       body: BlocConsumer<UserBloc, UserState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is UserUpdateSuccess) {
+            // Simpan data name, email, phone ke local storage
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString('name', nameController.text);
+            await prefs.setString('email', emailController.text);
+            await prefs.setString('phonenumber', phoneController.text);
+
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.green,
-              ),
+              SnackBar(content: Text(state.message), backgroundColor: Colors.green),
             );
-            context.pop();
+            context.go('/profile');
           } else if (state is UserError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-              ),
+              SnackBar(content: Text(state.message), backgroundColor: Colors.red),
             );
           }
         },
         builder: (context, state) {
           if (state is UserLoading) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: Color(0xFFFF9B58),
-              ),
-            );
+            return const Center(child: CircularProgressIndicator(color: Color(0xFFFF9B58)));
           }
 
           if (state is UserError && state.user == null) {
@@ -445,16 +465,11 @@ class _EditProfileViewState extends State<EditProfileView> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    state.message,
-                    style: const TextStyle(color: Colors.red),
-                    textAlign: TextAlign.center,
-                  ),
+                  Text(state.message, style: const TextStyle(color: Colors.red)),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      // Ambil userId dari session/auth state
-                      final userId = '1';
+                      final userId = '5';
                       context.read<UserBloc>().add(LoadUser(userId: userId));
                     },
                     child: const Text('Retry'),
@@ -467,14 +482,10 @@ class _EditProfileViewState extends State<EditProfileView> {
           User? user;
           if (state is UserLoaded) {
             user = state.user;
-          } else if (state is UserUpdating) {
-            user = state.user;
-          } else if (state is UserError && state.user != null) {
-            user = state.user;
           }
 
           if (user == null) {
-            return const Center(child: Text('No user data available'));
+            return const Center(child: Text(''));
           }
 
           _initializeControllers(user);
@@ -484,12 +495,7 @@ class _EditProfileViewState extends State<EditProfileView> {
             nameController: nameController,
             emailController: emailController,
             phoneController: phoneController,
-            selectedDate: selectedDate,
-            onDateSelected: (date) {
-              setState(() {
-                selectedDate = date;
-              });
-            },
+            passwordController: passwordController,
             onSave: _saveProfile,
             isUpdating: state is UserUpdating,
           );
@@ -502,11 +508,21 @@ class _EditProfileViewState extends State<EditProfileView> {
     final userBloc = context.read<UserBloc>();
     if (currentUser == null) return;
 
+    if (passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Password wajib diisi, master!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     final updatedUser = currentUser!.copyWith(
       name: nameController.text,
       email: emailController.text,
       phone: phoneController.text,
-      dateOfBirth: selectedDate,
+      password: passwordController.text,
     );
 
     userBloc.add(UpdateUser(user: updatedUser));
@@ -518,8 +534,7 @@ class EditProfileContent extends StatelessWidget {
   final TextEditingController nameController;
   final TextEditingController emailController;
   final TextEditingController phoneController;
-  final String? selectedDate;
-  final Function(String) onDateSelected;
+  final TextEditingController passwordController;
   final VoidCallback onSave;
   final bool isUpdating;
 
@@ -529,8 +544,7 @@ class EditProfileContent extends StatelessWidget {
     required this.nameController,
     required this.emailController,
     required this.phoneController,
-    required this.selectedDate,
-    required this.onDateSelected,
+    required this.passwordController,
     required this.onSave,
     required this.isUpdating,
   });
@@ -540,13 +554,10 @@ class EditProfileContent extends StatelessWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
-          // Profile picture area
           Container(
             decoration: const BoxDecoration(
               color: Color(0xFFFF9B58),
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(30),
-              ),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
             ),
             padding: const EdgeInsets.only(bottom: 30, top: 10),
             child: Center(
@@ -559,11 +570,7 @@ class EditProfileContent extends StatelessWidget {
                         ? NetworkImage(user.profileImageUrl!)
                         : null,
                     child: user.profileImageUrl == null
-                        ? const Icon(
-                            Icons.person,
-                            size: 50,
-                            color: Colors.grey,
-                          )
+                        ? const Icon(Icons.person, size: 50, color: Colors.grey)
                         : null,
                   ),
                   Positioned(
@@ -577,7 +584,9 @@ class EditProfileContent extends StatelessWidget {
                       ),
                       child: InkWell(
                         onTap: () {
-                          _selectProfilePhoto(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Edit profile photo tapped')),
+                          );
                         },
                         child: const Icon(Icons.camera_alt, size: 20),
                       ),
@@ -587,140 +596,31 @@ class EditProfileContent extends StatelessWidget {
               ),
             ),
           ),
-          
           const SizedBox(height: 30),
-          
-          // Form fields
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Personal Information',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                const Text('Personal Information', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),
-                
-                // Name field
-                TextField(
-                  controller: nameController,
-                  enabled: !isUpdating,
-                  decoration: InputDecoration(
-                    labelText: 'Full Name',
-                    labelStyle: TextStyle(color: Colors.grey[600]),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Color(0xFFFF9B58)),
-                    ),
-                    disabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                  ),
-                ),
-                
+                _buildTextField(label: 'Full Name', controller: nameController, isUpdating: isUpdating),
                 const SizedBox(height: 16),
-                
-                // Email field
-                TextField(
-                  controller: emailController,
-                  enabled: !isUpdating,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    labelStyle: TextStyle(color: Colors.grey[600]),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Color(0xFFFF9B58)),
-                    ),
-                    disabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                
+                _buildTextField(label: 'Email', controller: emailController, isUpdating: isUpdating),
                 const SizedBox(height: 16),
-                
-                // Phone field
-                TextField(
+                _buildTextField(
+                  label: 'Phone Number',
                   controller: phoneController,
-                  enabled: !isUpdating,
-                  decoration: InputDecoration(
-                    labelText: 'Phone Number',
-                    labelStyle: TextStyle(color: Colors.grey[600]),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: Color(0xFFFF9B58)),
-                    ),
-                    disabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.grey[300]!),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                  ),
+                  isUpdating: isUpdating,
                   keyboardType: TextInputType.phone,
                 ),
-                
                 const SizedBox(height: 16),
-                
-                // Date of Birth field
-                InkWell(
-                  onTap: isUpdating ? null : () {
-                    _selectDate(context);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey[300]!),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          selectedDate ?? 'Date of Birth',
-                          style: TextStyle(
-                            color: selectedDate != null ? Colors.black : Colors.grey[600],
-                          ),
-                        ),
-                        const Icon(Icons.calendar_today, size: 20),
-                      ],
-                    ),
-                  ),
+                _buildTextField(
+                  label: 'Password',
+                  controller: passwordController,
+                  isUpdating: isUpdating,
+                  obscureText: true,
                 ),
-                
-                const SizedBox(height: 40),
               ],
             ),
           ),
@@ -729,28 +629,34 @@ class EditProfileContent extends StatelessWidget {
     );
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now().subtract(const Duration(days: 365 * 25)),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFFFF9B58),
-            ),
-          ),
-          child: child!,
-        );
-      },
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    required bool isUpdating,
+    TextInputType keyboardType = TextInputType.text,
+    bool obscureText = false,
+  }) {
+    return TextField(
+      controller: controller,
+      enabled: !isUpdating,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.grey[600]),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFFFF9B58)),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
     );
-    
-    if (picked != null) {
-      onDateSelected("${picked.day}/${picked.month}/${picked.year}");
-    }
   }
+}
   
   void _selectProfilePhoto(BuildContext context) {
     showModalBottomSheet(
@@ -803,4 +709,3 @@ class EditProfileContent extends StatelessWidget {
       },
     );
   }
-}
