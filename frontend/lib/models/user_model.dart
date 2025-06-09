@@ -1,5 +1,6 @@
 class User {
   final String id;
+  final String uid;
   final String name;
   final String email;
   final String password;
@@ -9,6 +10,7 @@ class User {
 
   const User({
     required this.id,
+    required this.uid,
     required this.name,
     required this.email,
     required this.phone,
@@ -19,7 +21,8 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['uid']?.toString() ?? json['userid']?.toString() ?? '',
+      id: json['userid']?.toString() ?? '',
+      uid: json['uid']?.toString() ?? '',
       name: json['name'] ?? '',
       email: json['email'] ?? '',
       phone: json['phonenumber'] ?? '',
@@ -31,15 +34,17 @@ class User {
 
   User copyWith({
     String? id,
+    String? uid,
     String? name,
     String? email,
     String? phone,
-    String? profileImageUrl,
     String? password,
+    String? profileImageUrl,
     bool? isPremium,
   }) {
     return User(
       id: id ?? this.id,
+      uid: uid ?? this.uid,
       name: name ?? this.name,
       email: email ?? this.email,
       phone: phone ?? this.phone,

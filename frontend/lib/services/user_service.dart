@@ -15,12 +15,12 @@ class UserService {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body) as Map<String, dynamic>;
-        print('Response data: $data'); // optional debug log
+        print('Response data: $data'); // debug log opsional
 
         final prefs = await SharedPreferences.getInstance();
 
-        // hanya simpan jika nilai dari server tidak null
-        if (data['id'] != null) await prefs.setString('userid', data['id']);
+        // Simpan uid, bukan id atau userid
+        if (data['uid'] != null) await prefs.setString('uid', data['uid']);
         if (data['name'] != null) await prefs.setString('name', data['name']);
         if (data['email'] != null) await prefs.setString('email', data['email']);
         if (data['phonenumber'] != null) await prefs.setString('phonenumber', data['phonenumber']);
@@ -38,9 +38,9 @@ class UserService {
     } catch (_) {
       final prefs = await SharedPreferences.getInstance();
 
-      // fallback baca dari local jika gagal koneksi atau error lainnya
+      // fallback baca dari local jika gagal koneksi atau error
       return {
-        'id': prefs.getString('userid') ?? '',
+        'uid': prefs.getString('uid') ?? '',
         'name': prefs.getString('name') ?? '',
         'email': prefs.getString('email') ?? '',
         'phonenumber': prefs.getString('phonenumber') ?? '',
@@ -53,11 +53,11 @@ class UserService {
   Future<Map<String, dynamic>> updateUserProfile(dynamic user) async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userid');
-    
+
     if (userId == null) {
       throw Exception('User ID not found in local storage');
     }
-    
+
     final response = await http.put(
       Uri.parse('$baseUrl/$userId/update'),
       body: {
@@ -71,9 +71,9 @@ class UserService {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     }
+
     throw Exception('Failed to update user profile');
   }
-
 
   Future<Map<String, dynamic>> updateProfileImage(String userId, String imageUrl) async {
     // Implement API for profile image update if available

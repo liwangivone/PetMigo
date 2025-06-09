@@ -2,6 +2,7 @@ package com.group4.petmigo.DTO;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import lombok.Data;
 
 @Data
@@ -14,4 +15,5 @@ public class UserDTO {
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String uid;
 }

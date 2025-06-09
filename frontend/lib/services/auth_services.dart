@@ -21,10 +21,13 @@ class AuthServices {
           final user = User.fromJson(data);
 
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('userid', user.id.toString());
+          await prefs.setString('userid', user.id);        // simpan id lokal di 'userid'
+          await prefs.setString('uid', user.uid);           // simpan uid global di 'uid'
           await prefs.setString('name', user.name);
           await prefs.setString('email', user.email);
-          await prefs.setString('phonenumber', user.phone ?? '');
+          await prefs.setString('phonenumber', user.phone);
+          await prefs.setString('profileImageUrl', user.profileImageUrl ?? '');
+          await prefs.setBool('isPremium', user.isPremium);
 
           return user;
         } catch (e) {
