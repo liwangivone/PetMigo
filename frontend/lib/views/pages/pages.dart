@@ -19,20 +19,26 @@ import 'package:frontend/bloc/my_expenses_bloc/expenses_bloc.dart';
 import 'package:frontend/bloc/my_expenses_bloc/expenses_state.dart';
 import 'package:frontend/bloc/my_expenses_bloc/expenses_event.dart';
 
-//Dll
+//Dll (library pihak ketiga)
 import 'package:pie_chart/pie_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-//services
+//Services
 import 'package:frontend/services/user_auth_service.dart';
 import 'package:frontend/services/auth_services.dart';
 import 'package:frontend/services/user_service.dart';
 
-//repository
+//Repository
 import 'package:frontend/repository/auth_repository.dart';
 import 'package:frontend/repository/user_repository.dart';
 
-//Tampilan
+//Shared Preferences (package resmi)
+import 'package:shared_preferences/shared_preferences.dart';
+
+// Jika kamu punya helper shared_preferences sendiri, tambahkan di sini
+// import 'helpers/shared_preferences.dart'; 
+
+// Tampilan - bagian file dipisah dengan directive 'part'
 part 'vets_list_page.dart';
 part 'splash_screen.dart';
 part 'onboarding_pages.dart';
@@ -47,5 +53,3 @@ part 'bottom_navbar.dart';
 part 'add_new_pet.dart';
 part 'vet_detail_page.dart';
 part 'vet_chat_page.dart';
-
-

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserService {
   final String baseUrl;
@@ -14,20 +15,29 @@ class UserService {
   }
 
   Future<Map<String, dynamic>> updateUserProfile(dynamic user) async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userid');
+    
+    if (userId == null) {
+      throw Exception('User ID not found in local storage');
+    }
+    
     final response = await http.put(
-      Uri.parse('$baseUrl/${user.id}/update'),
+      Uri.parse('$baseUrl/$userId/update'),
       body: {
         'name': user.name,
         'email': user.email,
         'phonenumber': user.phone,
-        // Add password if needed
+        'password': user.password,
       },
     );
+
     if (response.statusCode == 200) {
       return json.decode(response.body);
     }
     throw Exception('Failed to update user profile');
   }
+
 
   Future<Map<String, dynamic>> updateProfileImage(String userId, String imageUrl) async {
     // Implement API for profile image update if available

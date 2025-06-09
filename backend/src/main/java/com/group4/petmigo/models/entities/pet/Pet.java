@@ -42,7 +42,6 @@ public class Pet {
 
 
     @OneToMany(mappedBy = "pet", fetch = FetchType.LAZY)
-    @JsonIgnore
     private List<PetSchedule> petSchedule;
 
     @ManyToOne(fetch = FetchType.LAZY)

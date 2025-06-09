@@ -1,129 +1,142 @@
 package com.group4.petmigo.Service;
 
+import com.group4.petmigo.models.entities.pet.Pet;
 import com.group4.petmigo.models.entities.pet.PetSchedule;
 import com.group4.petmigo.models.entities.pet.PetScheduleCategory;
-import com.group4.petmigo.models.entities.pet.Pet;
+import com.group4.petmigo.Repository.PetRepository;
+import com.group4.petmigo.Repository.PetScheduleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.*;
 
 import java.time.LocalDate;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class PetScheduleServiceTest {
+public class PetScheduleServiceTest {
 
-    private Map<Long, PetSchedule> scheduleDb;
-    private Pet dummyPet;
+    @Mock
+    private PetScheduleRepository scheduleRepository;
+
+    @Mock
+    private PetRepository petRepository;
+
+    @InjectMocks
+    private PetScheduleService petScheduleService;
 
     @BeforeEach
-    void setUp() {
-        scheduleDb = new HashMap<>();
-
-        // Mock Pet
-        dummyPet = mock(Pet.class);
-        when(dummyPet.getPetid()).thenReturn(1L);
-        when(dummyPet.getName()).thenReturn("Snowy");
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void testCreateSchedules() {
-        PetSchedule s1 = createPetSchedule(1L, PetScheduleCategory.Vaccination, 100, "Rabies vaccine", LocalDate.of(2024,6,1));
-        PetSchedule s2 = createPetSchedule(2L, PetScheduleCategory.Food, 200, "Food", LocalDate.of(2024,6,15));
-        PetSchedule s3 = createPetSchedule(3L, PetScheduleCategory.Grooming, 300, "Full grooming", LocalDate.of(2024,7,1));
+    public void testCreateSchedule_Success() {
+        Long petId = 1L;
 
-        scheduleDb.put(s1.getSchedule_id(), s1);
-        scheduleDb.put(s2.getSchedule_id(), s2);
-        scheduleDb.put(s3.getSchedule_id(), s3);
+        Pet pet = new Pet();
+        pet.setPetid(petId);
 
-        assertEquals(3, scheduleDb.size());
+        PetSchedule inputSchedule = new PetSchedule();
+        inputSchedule.setDescription("Food");
+        inputSchedule.setDate(LocalDate.of(2025, 6, 8));
+        inputSchedule.setExpense(50000);
+        inputSchedule.setCategory(PetScheduleCategory.Food);
 
-        System.out.println("testCreateSchedules: Created 3 schedules.");
+        // Mock findById petRepository
+        when(petRepository.findById(petId)).thenReturn(Optional.of(pet));
+
+        // Mock save scheduleRepository, mengembalikan objek schedule dengan pet sudah di-set
+        when(scheduleRepository.save(any(PetSchedule.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        PetSchedule result = petScheduleService.createSchedule(petId, inputSchedule);
+
+        assertNotNull(result);
+        assertEquals("Food", result.getDescription());
+        assertEquals(pet, result.getPet());
+
+        System.out.println("Create Schedule Result: " + result.getDescription() + ", Pet ID: " + result.getPet().getPetid());
     }
 
     @Test
-    void testReadSchedule() {
-        PetSchedule s1 = createPetSchedule(1L, PetScheduleCategory.Vaccination, 100, "Rabies vaccine", LocalDate.of(2024,6,1));
-        scheduleDb.put(s1.getSchedule_id(), s1);
+    public void testUpdateSchedule_Success() {
+        Long scheduleId = 1L;
 
-        PetSchedule fetched = scheduleDb.get(1L);
+        PetSchedule existingSchedule = new PetSchedule();
+        existingSchedule.setDescription("Old Description");
+        existingSchedule.setDate(LocalDate.of(2025, 1, 1));
+        existingSchedule.setExpense(20000);
+        existingSchedule.setCategory(PetScheduleCategory.Vaccination);
 
-        assertNotNull(fetched);
-        assertEquals(100, fetched.getExpense());
+        PetSchedule updateData = new PetSchedule();
+        updateData.setDescription("New Description");
+        updateData.setDate(LocalDate.of(2025, 6, 8));
+        updateData.setExpense(30000);
+        updateData.setCategory(PetScheduleCategory.Others);
 
-        System.out.println("testReadSchedule: Read schedule ID 1 with expense = " + fetched.getExpense());
+        when(scheduleRepository.findById(scheduleId)).thenReturn(Optional.of(existingSchedule));
+        when(scheduleRepository.save(any(PetSchedule.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        PetSchedule updated = petScheduleService.updateSchedule(scheduleId, updateData);
+
+        assertEquals("New Description", updated.getDescription());
+        assertEquals(LocalDate.of(2025, 6, 8), updated.getDate());
+        assertEquals(30000, updated.getExpense());
+
+        // Bandingkan enum, bukan string
+        assertEquals(PetScheduleCategory.Others, updated.getCategory());
+
+        System.out.println("Update Schedule Result: " + updated.getDescription() + ", Category: " + updated.getCategory());
     }
 
     @Test
-    void testUpdateSchedule() {
-        PetSchedule s1 = createPetSchedule(1L, PetScheduleCategory.Vaccination, 100, "Rabies vaccine", LocalDate.of(2024,6,1));
-        scheduleDb.put(s1.getSchedule_id(), s1);
+    public void testDeleteSchedule_VerifyDeleteCalled() {
+        Long scheduleId = 1L;
 
-        // Update data
-        PetSchedule toUpdate = scheduleDb.get(1L);
-        toUpdate.setExpense(150);
-        toUpdate.setDescription("Rabies + Distemper vaccine");
-        scheduleDb.put(1L, toUpdate);
+        doNothing().when(scheduleRepository).deleteById(scheduleId);
 
-        assertEquals(150, scheduleDb.get(1L).getExpense());
-        assertEquals("Rabies + Distemper vaccine", scheduleDb.get(1L).getDescription());
+        petScheduleService.deleteSchedule(scheduleId);
 
-        System.out.println("testUpdateSchedule: Updated schedule ID 1 with new expense = " + scheduleDb.get(1L).getExpense());
+        verify(scheduleRepository, times(1)).deleteById(scheduleId);
+
+        System.out.println("Delete schedule called for ID: " + scheduleId);
     }
 
     @Test
-    void testDeleteSchedule() {
-        PetSchedule s1 = createPetSchedule(1L, PetScheduleCategory.Vaccination, 100, "Rabies vaccine", LocalDate.of(2024,6,1));
-        scheduleDb.put(s1.getSchedule_id(), s1);
+    public void testGetPetsWithSchedulesAndTotalExpenseByUserId() {
+        Long userId = 10L;
 
-        scheduleDb.remove(1L);
+        // Setup pets and schedules
+        PetSchedule schedule1 = new PetSchedule();
+        schedule1.setExpense(10000);
 
-        assertFalse(scheduleDb.containsKey(1L));
+        PetSchedule schedule2 = new PetSchedule();
+        schedule2.setExpense(20000);
 
-        System.out.println("testDeleteSchedule: Deleted schedule ID 1. Exists? " + scheduleDb.containsKey(1L));
-    }
+        Pet pet1 = new Pet();
+        pet1.setPetid(1L);
+        pet1.setPetSchedule(List.of(schedule1));
 
-    @Test
-    void testMultipleSchedulesAndTotalExpense() {
-        PetSchedule s1 = createPetSchedule(1L, PetScheduleCategory.Vaccination, 100, "Rabies vaccine", LocalDate.of(2024,6,1));
-        PetSchedule s2 = createPetSchedule(2L, PetScheduleCategory.Food, 300, "Food", LocalDate.of(2024,6,15));
-        PetSchedule s3 = createPetSchedule(3L, PetScheduleCategory.Grooming, 300, "Full grooming", LocalDate.of(2024,7,1));
+        Pet pet2 = new Pet();
+        pet2.setPetid(2L);
+        pet2.setPetSchedule(List.of(schedule2));
 
-        scheduleDb.put(s1.getSchedule_id(), s1);
-        scheduleDb.put(s2.getSchedule_id(), s2);
-        scheduleDb.put(s3.getSchedule_id(), s3);
+        List<Pet> pets = List.of(pet1, pet2);
 
-        assertEquals(3, scheduleDb.size());
+        when(petRepository.findPetsWithSchedulesByUserId(userId)).thenReturn(pets);
 
-        int totalExpense = scheduleDb.values()
-            .stream()
-            .mapToInt(PetSchedule::getExpense)
-            .sum();
+        Map<String, Object> result = petScheduleService.getPetsWithSchedulesAndTotalExpenseByUserId(userId);
 
-        System.out.println("testMultipleSchedulesAndTotalExpense: Total expense = " + totalExpense);
+        assertNotNull(result);
+        assertTrue(result.containsKey("pets"));
+        assertTrue(result.containsKey("totalExpense"));
 
-        assertEquals(700, totalExpense);
+        int totalExpense = (int) result.get("totalExpense");
+        assertEquals(30000, totalExpense);
 
-        // Print detail tiap schedule
-        scheduleDb.values().forEach(s -> System.out.println(
-                "Schedule ID: " + s.getSchedule_id() +
-                ", Category: " + s.getCategory() +
-                ", Expense: " + s.getExpense() +
-                ", Description: " + s.getDescription() +
-                ", Pet Name: " + s.getPet().getName()
-        ));
-    }
-
-    // Helper method untuk buat PetSchedule dummy
-    private PetSchedule createPetSchedule(Long id, PetScheduleCategory category, int expense, String desc, LocalDate date) {
-        PetSchedule schedule = new PetSchedule();
-        schedule.setSchedule_id(id);
-        schedule.setCategory(category);
-        schedule.setExpense(expense);
-        schedule.setDescription(desc);
-        schedule.setDate(date);
-        schedule.setPet(dummyPet);
-        return schedule;
+        System.out.println("Total Expense for user " + userId + ": " + totalExpense);
+        System.out.println("Number of pets returned: " + ((List<?>) result.get("pets")).size());
     }
 }

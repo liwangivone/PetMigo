@@ -6,8 +6,7 @@ import com.group4.petmigo.Repository.PetRepository;
 import com.group4.petmigo.Repository.PetScheduleRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PetScheduleService {
@@ -28,21 +27,16 @@ public class PetScheduleService {
         return scheduleRepository.save(schedule);
     }
 
-    public Optional<PetSchedule> getScheduleById(Long id) {
-        return scheduleRepository.findById(id);
-    }
-
     public PetSchedule updateSchedule(Long schedule_id, PetSchedule schedule) {
         PetSchedule existing = scheduleRepository.findById(schedule_id)
-            .orElseThrow(() -> new RuntimeException("Schedule not found with id " + schedule_id));
+                .orElseThrow(() -> new RuntimeException("Schedule not found with id " + schedule_id));
 
         // Update field yang diizinkan saja
         existing.setDescription(schedule.getDescription());
         existing.setDate(schedule.getDate());
         existing.setExpense(schedule.getExpense());
-        // Tambahkan field lain yang perlu diupdate jika ada
-
-        // Jangan ubah existing.setPet() supaya relasi ke pet tetap aman
+        existing.setCategory(schedule.getCategory()); // tambahkan ini agar category bisa berubah
+        // Jangan ubah relasi pet
 
         return scheduleRepository.save(existing);
     }
@@ -51,16 +45,20 @@ public class PetScheduleService {
         scheduleRepository.deleteById(id);
     }
 
-    public List<PetSchedule> getAllSchedules() {
-        return scheduleRepository.findAll();
+    // Ambil semua pets beserta schedules dari userId, dan total expenses-nya
+    public Map<String, Object> getPetsWithSchedulesAndTotalExpenseByUserId(Long userId) {
+        List<Pet> pets = petRepository.findPetsWithSchedulesByUserId(userId);
+
+        int totalExpense = pets.stream()
+                .flatMap(pet -> pet.getPetSchedule().stream())
+                .mapToInt(schedule -> schedule.getExpense())
+                .sum();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("pets", pets);
+        result.put("totalExpense", totalExpense);
+
+        return result;
     }
 
-    public int getTotalExpenseByPetId(Long petid) {
-        // ambil semua schedule yang punya pet dengan id petId
-        List<PetSchedule> schedules = scheduleRepository.findByPet_petid(petid);
-        
-        return schedules.stream()
-                .mapToInt(PetSchedule::getExpense)
-                .sum();
-    }
 }

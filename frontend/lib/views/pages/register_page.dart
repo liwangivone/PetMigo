@@ -20,12 +20,12 @@ class RegisterScreen extends StatelessWidget {
               ),
             );
             // Navigate to dashboard
-            context.go('/dashboard');
+            context.go('/login');
           } else if (state.status == RegisterStatus.failure && state.errorMessage != null) {
             // Show error message in snackbar for important errors
             if (state.errorMessage!.contains('server') || 
                 state.errorMessage!.contains('koneksi') ||
-                state.errorMessage!.contains('terduga')) {
+                state.errorMessage!.contains('terdugaf')) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.errorMessage!),
