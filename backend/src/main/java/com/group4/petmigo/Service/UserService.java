@@ -148,6 +148,7 @@ public class UserService {
         dto.setName(user.getName());
         dto.setEmail(user.getEmail());
         dto.setPhonenumber(user.getPhonenumber());
+        dto.setUid(user.getUid());
         return dto;
     }
 

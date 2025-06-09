@@ -14,14 +14,12 @@ class ProfilePage extends StatelessWidget {
     return FutureBuilder<String?>(
       future: _getUserIdFromLocalStorage(),
       builder: (context, snapshot) {
-        // Tampilkan loading dulu kalau data belum siap
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        // Kalau data tidak ada atau null, tampilkan pesan error
         if (!snapshot.hasData || snapshot.data == null) {
           return const Scaffold(
             body: Center(child: Text('User ID not found. Please login again.')),
@@ -30,7 +28,6 @@ class ProfilePage extends StatelessWidget {
 
         final userId = snapshot.data!;
 
-        // Pakai BlocProvider untuk load user dengan userId yang didapat
         return BlocProvider(
           create: (context) => UserBloc(
             userRepository: UserRepository(userService: UserService()),
@@ -44,6 +41,11 @@ class ProfilePage extends StatelessWidget {
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
+
+  Future<String?> _getUserIdFromLocalStorage() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userid');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,9 +103,15 @@ class ProfileView extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () {
-                      final userId = '1';
-                      context.read<UserBloc>().add(LoadUser(userId: userId));
+                    onPressed: () async {
+                      final userId = await _getUserIdFromLocalStorage();
+                      if (userId != null) {
+                        context.read<UserBloc>().add(LoadUser(userId: userId));
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('User ID not found in local storage.')),
+                        );
+                      }
                     },
                     child: const Text('Retry'),
                   ),
@@ -190,7 +198,7 @@ class ProfileContent extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  user.id,
+                  user.uid,
                   style: const TextStyle(color: Colors.white70),
                 ),
               ],
@@ -308,7 +316,7 @@ class ProfileContent extends StatelessWidget {
           child: TextButton.icon(
             onPressed: () async {
               final prefs = await SharedPreferences.getInstance();
-              await prefs.clear(); // Hapus semua data di SharedPreferences
+              await prefs.clear();
 
               context.read<UserBloc>().add(const LogoutUser());
             },
@@ -439,7 +447,6 @@ class _EditProfileViewState extends State<EditProfileView> {
       body: BlocConsumer<UserBloc, UserState>(
         listener: (context, state) async {
           if (state is UserUpdateSuccess) {
-            // Simpan data name, email, phone ke local storage
             final prefs = await SharedPreferences.getInstance();
             await prefs.setString('name', nameController.text);
             await prefs.setString('email', emailController.text);
@@ -448,11 +455,12 @@ class _EditProfileViewState extends State<EditProfileView> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message), backgroundColor: Colors.green),
             );
-            context.go('/profile');
+            context.go('/profile'); // redirect saat sukses
           } else if (state is UserError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message), backgroundColor: Colors.red),
             );
+            context.go('/profile'); // redirect saat error juga
           }
         },
         builder: (context, state) {
