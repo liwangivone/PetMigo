@@ -26,7 +26,7 @@ void main() {
         child: MaterialApp.router(
           routerDelegate: router.routerDelegate,
           routeInformationParser: router.routeInformationParser,
-          routeInformationProvider: router.routeInformationProvider, // ✅ Fix added
+          routeInformationProvider: router.routeInformationProvider, 
         ),
       );
     }
