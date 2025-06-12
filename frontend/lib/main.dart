@@ -75,6 +75,14 @@ class MyApp extends StatelessWidget {
             return ChatPage(vet: vet);
           },
         ),
+        GoRoute(
+          path: '/vet-dashboard',
+          builder: (context, state) => const VetDashboardPage(),
+        ),
+        GoRoute(
+          path: '/vet-chats',
+          builder: (context, state) => const VetChatListPage(),
+        ),
       ],
     );
 

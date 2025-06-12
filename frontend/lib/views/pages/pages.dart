@@ -24,8 +24,6 @@ import 'package:pie_chart/pie_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 //Services
-import 'package:frontend/services/user_auth_service.dart';
-import 'package:frontend/services/auth_services.dart';
 import 'package:frontend/services/user_service.dart';
 
 //Repository
@@ -35,8 +33,8 @@ import 'package:frontend/repository/user_repository.dart';
 //Shared Preferences (package resmi)
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Jika kamu punya helper shared_preferences sendiri, tambahkan di sini
-// import 'helpers/shared_preferences.dart'; 
+//widget
+import 'package:frontend/widget/chat_card.dart';
 
 // Tampilan - bagian file dipisah dengan directive 'part'
 part 'vets_list_page.dart';
@@ -53,3 +51,5 @@ part 'bottom_navbar.dart';
 part 'add_new_pet.dart';
 part 'vet_detail_page.dart';
 part 'vet_chat_page.dart';
+part 'vet_dashboard_page.dart';
+part 'vet_chat_list_page.dart';
