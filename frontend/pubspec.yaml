@@ -19,6 +19,8 @@ dependencies:
   http: ^1.4.0
   pie_chart: ^5.4.0
   google_fonts: ^6.2.1
+  intl: ^0.19.0  # Versi terbaru saat ini
+  timeago: ^3.6.0
 
 dev_dependencies:
   flutter_test:

@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:frontend/bloc/my_expenses_bloc/expenses_bloc.dart';
-import 'views/pages/pages.dart';
-import 'package:frontend/models/vet_models.dart';
+import 'package:frontend/bloc/petschedule/pet_schedule_bloc.dart';
+import 'package:frontend/services/pet_service.dart';
+import 'package:frontend/services/petschedules_service.dart';
+import 'package:frontend/services/user_service.dart';
 import 'package:go_router/go_router.dart';
+
+import 'package:frontend/bloc/user/user_bloc.dart';
+import 'package:frontend/bloc/pet/pet_bloc.dart';
+
+import 'package:frontend/models/vet_models.dart';
+import 'package:frontend/views/pages/pages.dart';
 
 void main() {
   runApp(const MyApp());
@@ -88,7 +95,9 @@ class MyApp extends StatelessWidget {
 
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => ExpensesBloc()),
+        BlocProvider(create: (_) => UserBloc(userService: UserService())),
+        BlocProvider(create: (_) => PetBloc(PetService())),
+        BlocProvider(create: (_) => PetScheduleBloc(PetScheduleService())),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
@@ -98,3 +107,60 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Login')),
+      body: const Center(
+        child: Text('Login Page - Not implemented yet'),
+      ),
+    );
+  }
+}
+
+class DashboardPage extends StatelessWidget {
+  const DashboardPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Dashboard')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Dashboard Page - Not implemented yet'),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => context.go('/profile'),
+              child: const Text('Go to Profile'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SubscriptionPage extends StatelessWidget {
+  const SubscriptionPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Subscription'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
+        ),
+      ),
+      body: const Center(
+        child: Text('Subscription Page - Not implemented yet'),
+      ),
+    );
+  }
+}

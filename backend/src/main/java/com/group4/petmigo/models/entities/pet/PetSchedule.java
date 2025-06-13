@@ -1,6 +1,6 @@
 package com.group4.petmigo.models.entities.pet;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -27,7 +27,7 @@ public class PetSchedule {
     private String description; // description String agar bisa mengimput abcd 
 
     @Column(name = "date", nullable = false)
-    private LocalDate date; // memakai local date agar data lebih gampang di baca saat memakai kalender
+    private LocalDateTime date; // memakai local date agar data lebih gampang di baca saat memakai kalender
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pet_id", nullable = false)

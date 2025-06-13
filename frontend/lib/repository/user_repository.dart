@@ -19,9 +19,4 @@ class UserRepository {
     final json = await userService.updateProfileImage(userId, imageUrl);
     return User.fromJson(json);
   }
-
-  Future<void> logout() async {
-    await userService.logout();
-  }
-
 }

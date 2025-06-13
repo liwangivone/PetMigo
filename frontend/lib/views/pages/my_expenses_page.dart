@@ -4,75 +4,111 @@ class MyExpensesPage extends StatefulWidget {
   const MyExpensesPage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _MyExpensesPageState createState() => _MyExpensesPageState();
 }
 
 class _MyExpensesPageState extends State<MyExpensesPage> {
+  String selectedFilter = "All";
+
+  final Map<String, Color> categoryColors = {
+    "Vaccination": Colors.red,
+    "Grooming": Colors.blue,
+    "Food": Colors.green,
+    "Toys": Colors.orange,
+    "Snack": Colors.purple,
+    "Others": Colors.grey,
+  };
+
+  final List<String> orderedCategories =
+      PetScheduleCategory.values.map((e) => e.name).toList();
+
   @override
   void initState() {
-    context.read<ExpensesBloc>().add(LoadExpenses());
     super.initState();
+    context.read<PetScheduleBloc>().add(LoadPetSchedules());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<ExpensesBloc, ExpensesState>(
+      body: BlocBuilder<PetScheduleBloc, PetScheduleState>(
         builder: (context, state) {
-          if (state is ExpensesLoading) {
+          if (state is PetScheduleLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (state is ExpensesLoaded) {
-            final expenses = state.expenses;
+          if (state is PetScheduleLoaded) {
+            final allSchedules = state.schedules;
+            final expenses = allSchedules.where((e) => e.expense > 0).toList();
 
-            // Total
-            final total = expenses.fold<int>(0, (sum, e) => sum + e.amount);
+            final filteredExpenses = selectedFilter == "All"
+                ? expenses
+                : expenses
+                    .where((e) =>
+                        e.petType.toUpperCase() == selectedFilter.toUpperCase())
+                    .toList();
 
-            // Kelompokkan berdasarkan kategori
-            final dataMap = <String, double>{};
-            for (var e in expenses) {
-              dataMap[e.category] = (dataMap[e.category] ?? 0) + e.amount;
+            final total = filteredExpenses.fold<int>(0, (sum, e) => sum + e.expense);
+
+            final Map<String, double> fullDataMap = {
+              for (var cat in orderedCategories) cat: 0,
+            };
+
+            for (var e in filteredExpenses) {
+              final key = e.category.name;
+              fullDataMap[key] = (fullDataMap[key] ?? 0) + e.expense;
             }
 
-            // Kelompokkan berdasarkan tanggal
-            final grouped = <String, List<Expense>>{};
-            for (var e in expenses) {
-              grouped.putIfAbsent(e.date, () => []).add(e);
+            final filteredDataMap = Map.fromEntries(
+              fullDataMap.entries.where((entry) => entry.value > 0),
+            );
+
+            final colorList = filteredDataMap.keys
+                .map((key) => categoryColors[key] ?? Colors.grey)
+                .toList();
+
+            final Map<DateTime, List<PetSchedule>> grouped = {};
+            for (var e in filteredExpenses) {
+              final date = DateTime(e.date.year, e.date.month, e.date.day);
+              grouped.putIfAbsent(date, () => []).add(e);
             }
+
+            final sortedEntries = grouped.entries.toList()
+              ..sort((a, b) => b.key.compareTo(a.key));
 
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("My Expenses", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                  const Text("My Expenses",
+                      style:
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
-
-                  // Filter Buttons
                   Row(
                     children: [
-                      _chip("All", true),
-                      _chip("Cat", false),
-                      _chip("Dog", false),
+                      _chip("All", selectedFilter == "All"),
+                      _chip("CAT", selectedFilter == "CAT"),
+                      _chip("DOG", selectedFilter == "DOG"),
                     ],
                   ),
                   const SizedBox(height: 10),
-
-                  // Pie Chart Card
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 6)],
+                      boxShadow: const [
+                        BoxShadow(color: Colors.black12, blurRadius: 6)
+                      ],
                     ),
                     padding: const EdgeInsets.all(12),
                     child: Column(
                       children: [
                         Row(
                           children: [
-                            Text("Rp $total", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                            Text("Rp $total",
+                                style: const TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold)),
                             const Spacer(),
                             FloatingActionButton(
                               onPressed: () {},
@@ -83,36 +119,44 @@ class _MyExpensesPageState extends State<MyExpensesPage> {
                           ],
                         ),
                         const SizedBox(height: 10),
-                        PieChart(
-                          dataMap: dataMap.map((k, v) => MapEntry(k, v.toDouble())),
-                          colorList: [Colors.blue[200]!, Colors.red[200]!],
-                          chartType: ChartType.disc,
-                          chartRadius: 130,
-                          legendOptions: const LegendOptions(showLegends: true),
-                          chartValuesOptions: const ChartValuesOptions(showChartValues: false),
-                        ),
+                        if (filteredDataMap.isNotEmpty)
+                          SizedBox(
+                            height: 200,
+                            child: PieChart(
+                              dataMap: filteredDataMap,
+                              colorList: colorList,
+                              chartType: ChartType.disc,
+                              legendOptions:
+                                  const LegendOptions(showLegends: true),
+                              chartValuesOptions:
+                                  const ChartValuesOptions(showChartValues: false),
+                            ),
+                          )
+                        else
+                          const Text("Tidak ada data pengeluaran."),
                       ],
                     ),
                   ),
                   const SizedBox(height: 10),
-
-                  // List Per Tanggal
                   Expanded(
                     child: ListView(
-                      children: grouped.entries.map((entry) {
+                      children: sortedEntries.map((entry) {
                         final date = entry.key;
                         final items = entry.value;
-
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(top: 16.0, bottom: 8),
+                              padding: const EdgeInsets.only(top: 16, bottom: 8),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(_formatDate(date), style: const TextStyle(fontWeight: FontWeight.bold)),
-                                  const Text("View all", style: TextStyle(color: Colors.blue)),
+                                  Text(_formatDate(date),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                  const Text("View all",
+                                      style: TextStyle(color: Colors.blue)),
                                 ],
                               ),
                             ),
@@ -140,15 +184,47 @@ class _MyExpensesPageState extends State<MyExpensesPage> {
       child: ChoiceChip(
         label: Text(label),
         selected: isSelected,
-        onSelected: (_) {},
+        onSelected: (_) {
+          setState(() {
+            selectedFilter = label;
+          });
+        },
         selectedColor: Colors.blue[100],
       ),
     );
   }
 
-  Widget _expenseTile(Expense e) {
-    IconData icon = e.category == "Grooming" ? Icons.cut : Icons.medical_services;
-    Color color = e.category == "Grooming" ? Colors.blue : Colors.red;
+  Widget _expenseTile(PetSchedule e) {
+    IconData icon;
+    Color color;
+
+    switch (e.category.name) {
+      case "Vaccination":
+        icon = Icons.medical_services;
+        color = Colors.red;
+        break;
+      case "Grooming":
+        icon = Icons.cut;
+        color = Colors.blue;
+        break;
+      case "Food":
+        icon = Icons.restaurant;
+        color = Colors.green;
+        break;
+      case "Toys":
+        icon = Icons.toys;
+        color = Colors.orange;
+        break;
+      case "Snack":
+        icon = Icons.fastfood;
+        color = Colors.purple;
+        break;
+      case "Others":
+      default:
+        icon = Icons.event_note;
+        color = Colors.grey;
+        break;
+    }
 
     return Card(
       child: ListTile(
@@ -156,15 +232,14 @@ class _MyExpensesPageState extends State<MyExpensesPage> {
           backgroundColor: color.withOpacity(0.2),
           child: Icon(icon, color: color),
         ),
-        title: Text(e.title),
-        subtitle: Text("Rp ${e.amount} - ${e.petName}\n${e.time}"),
+        title: Text(e.description),
+        subtitle: Text("Rp ${e.expense} - ${e.petName}\n${DateFormat.Hm().format(e.date)}"),
         isThreeLine: true,
       ),
     );
   }
 
-  String _formatDate(String dateStr) {
-    DateTime date = DateTime.parse(dateStr);
+  String _formatDate(DateTime date) {
     return "${_namaHari(date.weekday)}, ${date.day} ${_bulan(date.month)} ${date.year}";
   }
 
