@@ -12,4 +12,7 @@ public class VetDTO {
     private String schedule;
     private String email;
     
+    // ── tambahan ──
+    private Long   clinicId;    // bisa null
+    private String clinicName;  // bisa null
 }

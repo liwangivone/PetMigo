@@ -1,0 +1,2 @@
+D:/~Kuliah/fetching5/PetMigo/frontend/android/app/.cxx/Debug/5q532j5y/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/~Kuliah/fetching5/PetMigo/frontend/android/app/.cxx/Debug/5q532j5y/armeabi-v7a/CMakeFiles/rebuild_cache.dir
