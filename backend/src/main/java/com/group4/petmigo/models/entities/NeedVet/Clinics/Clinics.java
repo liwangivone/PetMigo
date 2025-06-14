@@ -1,10 +1,9 @@
 package com.group4.petmigo.models.entities.NeedVet.Clinics;
 
+import java.util.ArrayList;
 import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.group4.petmigo.models.entities.NeedVet.Vet.Vet;
-
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -14,16 +13,24 @@ public class Clinics {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long clinics_id;
+    @Column(name = "clinics_id")
+    private Long clinicsid;
 
-    @Column(name = "name", nullable = false)
-    private String name;          // Changed from 'nama'
-    @Column(name = "location", nullable = false)
-    private String location;      // Changed from 'lokasi'
-    @Column(name = "openinghours", nullable = false)
-    private String openinghours;  // Changed from 'jadwalBuka'
+    @Column(nullable = false)
+    private String name;
 
-    @OneToMany(mappedBy = "clinics", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<Vet> vet;
+    @Column(nullable = false)
+    private String location;
+
+    @Column(nullable = false)
+    private String openinghours;
+
+// Clinics.java
+    @OneToMany(
+        mappedBy = "clinics",
+        cascade = {CascadeType.PERSIST, CascadeType.MERGE}, // ← Hanya simpan & update
+        orphanRemoval = false                               // ← Jangan hapus orphan
+    )
+    private List<Vet> vet = new ArrayList<>();
+
 }

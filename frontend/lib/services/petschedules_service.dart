@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:frontend/models/petschedules_model.dart';
 
 class PetScheduleService {
-  static const String baseUrl = 'http://localhost:8080/api/petschedules';
+  static const String baseUrl = 'http://192.168.241.117:8080/api/petschedules';
 
   // POST /pet/{petId}
   Future<Map<String, dynamic>> createSchedule(String petId, PetSchedule schedule) async {

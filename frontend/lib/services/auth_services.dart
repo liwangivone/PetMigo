@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 
 class AuthServices {
-  static const String baseUrl = 'http://localhost:8080/api/users';
+  static const String baseUrl = 'http://192.168.241.117:8080/api/users';
   static const Duration timeout = Duration(seconds: 10);
 
   Future<User> login(String email, String password) async {

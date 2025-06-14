@@ -62,7 +62,7 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: const BottomNavbar(currentIndex: 0),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => GoRouter.of(context).go('/add-pet'),
+        onPressed: () => GoRouter.of(context).go('/choosepet'),
         backgroundColor: Colors.blue,
         child: const Icon(Icons.add),
       ),

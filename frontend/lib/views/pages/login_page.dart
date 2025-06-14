@@ -5,8 +5,6 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return BlocProvider(
       create: (_) => LoginBloc(authRepository: AuthRepository()),
       child: BlocListener<LoginBloc, LoginState>(
@@ -20,53 +18,60 @@ class LoginScreen extends StatelessWidget {
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: Column(
+              child: Flex(
+                direction: Axis.vertical,
                 children: [
-                  const SizedBox(height: 40),
+                  const Spacer(flex: 1),
+
                   const Text(
                     "Welcome back",
                     style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 12),
+
+                  const Spacer(flex: 1),
+
                   Flexible(
                     flex: 3,
                     child: Image.asset(
                       'assets/images/petmigo_logo.png',
-                      height: screenHeight * 0.28,
                       fit: BoxFit.contain,
                     ),
                   ),
-                  const SizedBox(height: 24),
+
+                  const Spacer(flex: 1),
+
                   Expanded(
-                    flex: 4,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        _EmailInput(),
-                        const SizedBox(height: 16),
-                        _PasswordInput(),
-                        const SizedBox(height: 8),
-                        _ErrorMessage(),
-                        const SizedBox(height: 16),
-                        _LoginButton(),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text("Don't have an account? "),
-                            GestureDetector(
-                              onTap: () => context.go('/register'),
-                              child: const Text(
-                                "Sign Up",
-                                style: TextStyle(color: Colors.blue),
+                    flex: 5,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          _EmailInput(),
+                          const SizedBox(height: 16),
+                          _PasswordInput(),
+                          _ErrorMessage(),
+                          const SizedBox(height: 24),
+                          _LoginButton(),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text("Don't have an account? "),
+                              GestureDetector(
+                                onTap: () => context.go('/register'),
+                                child: const Text(
+                                  "Sign Up",
+                                  style: TextStyle(color: Colors.blue),
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+
+                  const Spacer(flex: 1),
                 ],
               ),
             ),

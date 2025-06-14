@@ -14,7 +14,7 @@ class BottomNavbar extends StatelessWidget {
         context.go('/askai');
         break;
       case 2:
-        context.go('/needvet');
+        context.go('/need-vet');
         break;
       case 3:
         context.go('/myexpenses');

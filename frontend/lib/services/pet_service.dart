@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:frontend/models/pet_model.dart';
 
 class PetService {
-  static const String baseUrl = 'http://localhost:8080/api/pet';
+  static const String baseUrl = 'http://192.168.241.117:8080/api/pet';
 
   // Ambil 1 pet
   Future<Map<String, dynamic>> getPetById(String petId) async {
