@@ -5,7 +5,6 @@ import com.group4.petmigo.Service.PetScheduleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.util.Map;
 
 @RestController

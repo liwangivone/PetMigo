@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:frontend/bloc/my_expenses_bloc/expenses_bloc.dart';
-import 'views/pages/pages.dart';
-import 'package:frontend/models/vet_models.dart';
+import 'package:frontend/bloc/petschedule/pet_schedule_bloc.dart';
+import 'package:frontend/services/pet_service.dart';
+import 'package:frontend/services/petschedules_service.dart';
+import 'package:frontend/services/user_service.dart';
 import 'package:go_router/go_router.dart';
+
+import 'package:frontend/bloc/user/user_bloc.dart';
+import 'package:frontend/bloc/pet/pet_bloc.dart';
+
+import 'package:frontend/models/vet_models.dart';
+import 'package:frontend/views/pages/pages.dart';
 
 void main() {
   runApp(const MyApp());
@@ -88,7 +95,9 @@ class MyApp extends StatelessWidget {
 
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => ExpensesBloc()),
+        BlocProvider(create: (_) => UserBloc(userService: UserService())),
+        BlocProvider(create: (_) => PetBloc(PetService())),
+        BlocProvider(create: (_) => PetScheduleBloc(PetScheduleService())),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

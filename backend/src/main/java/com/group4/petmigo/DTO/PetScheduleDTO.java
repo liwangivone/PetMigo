@@ -1,6 +1,7 @@
 package com.group4.petmigo.DTO;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import lombok.Data;
 
 @Data
@@ -9,5 +10,5 @@ public class PetScheduleDTO {
     private String category;
     private int expense;
     private String description;
-    private LocalDate date;
+    private LocalDateTime date;
 }
