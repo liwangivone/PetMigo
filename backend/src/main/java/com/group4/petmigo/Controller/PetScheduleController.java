@@ -5,6 +5,7 @@ import com.group4.petmigo.Service.PetScheduleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -17,37 +18,49 @@ public class PetScheduleController {
         this.service = service;
     }
 
+    /* ──────────────── Create ──────────────── */
     @PostMapping("/pet/{petId}")
-    public ResponseEntity<PetSchedule> createSchedule(@PathVariable Long petId, @RequestBody PetSchedule schedule) {
-        try {
-            PetSchedule created = service.createSchedule(petId, schedule);
-            return ResponseEntity.ok(created);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<PetSchedule> createSchedule(
+            @PathVariable Long petId,
+            @RequestBody PetSchedule schedule) {
+
+        PetSchedule created = service.createSchedule(petId, schedule);
+        return ResponseEntity.ok(created);
     }
 
-    @PutMapping("/schedules/{scheduleId}")
+    /* ──────────────── Update ──────────────── */
+    @PutMapping("/{scheduleId}")
     public ResponseEntity<PetSchedule> updateSchedule(
             @PathVariable Long scheduleId,
             @RequestBody PetSchedule schedule) {
-        try {
-            PetSchedule updated = service.updateSchedule(scheduleId, schedule);
-            return ResponseEntity.ok(updated);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+
+        PetSchedule updated = service.updateSchedule(scheduleId, schedule);
+        return ResponseEntity.ok(updated);
     }
 
-    @DeleteMapping("/{scheludeId}")
-    public ResponseEntity<Void> deleteSchedule(@PathVariable Long id) {
-        service.deleteSchedule(id);
+    /* ──────────────── Delete ──────────────── */
+    @DeleteMapping("/{scheduleId}")
+    public ResponseEntity<Void> deleteSchedule(@PathVariable Long scheduleId) {
+        service.deleteSchedule(scheduleId);
         return ResponseEntity.noContent().build();
     }
 
+    /* ──────────────── List jadwal per user ──────────────── */
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Map<String, Object>> getPetsSchedulesByUserId(@PathVariable Long userId) {
-        Map<String, Object> response = service.getPetsWithSchedulesAndTotalExpenseByUserId(userId);
+    public ResponseEntity<Map<String, Object>> getPetsSchedulesByUserId(
+            @PathVariable Long userId) {
+
+        Map<String, Object> response = service
+                .getPetsWithSchedulesAndTotalExpenseByUserId(userId);
         return ResponseEntity.ok(response);
+    }
+
+    /* ──────────────── 🔍 List jadwal per pet ──────────────── */
+    @GetMapping("/pet/{petId}")
+    public ResponseEntity<List<PetSchedule>> getSchedulesByPetId(
+            @PathVariable Long petId) {
+
+        List<PetSchedule> schedules = service.getSchedulesByPetId(petId);
+        return ResponseEntity.ok(schedules);
     }
 }

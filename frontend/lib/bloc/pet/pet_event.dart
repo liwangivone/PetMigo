@@ -9,3 +9,14 @@ class CreatePet extends PetEvent {
 
   CreatePet({required this.userId, required this.pet});
 }
+
+class UpdatePet extends PetEvent {
+  final Pet pet;
+  UpdatePet(this.pet);
+}
+
+class DeletePet extends PetEvent {
+  final String petId;
+  DeletePet(this.petId);
+}
+

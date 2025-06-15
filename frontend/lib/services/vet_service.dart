@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/vet_model.dart';
+import 'package:frontend/services/url.dart';
 
 class VetService {
-  // ganti IP/domain sesuai backend‑mu
   final String baseUrl;
-  VetService({this.baseUrl = 'http://192.168.241.117:8080/api/vets'});
+  VetService({this.baseUrl = kVetAPI});
 
   // ========= AUTH =========
   Future<VetModel> login(String email, String password) async {

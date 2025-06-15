@@ -15,6 +15,22 @@ class PetCreated extends PetState {
   const PetCreated(this.pet);
 }
 
+class PetUpdating extends PetState {}
+
+class PetUpdated extends PetState {
+  final Pet pet;
+  const PetUpdated(this.pet);
+}
+
+class PetDeleting extends PetState {}
+
+class PetDeleted extends PetState {}
+
+class PetLoaded extends PetState {
+  final List<Pet> pets;
+  const PetLoaded(this.pets);
+}
+
 class PetSuccess extends PetState {
   final String message;
   const PetSuccess(this.message);
@@ -23,9 +39,4 @@ class PetSuccess extends PetState {
 class PetError extends PetState {
   final String message;
   const PetError(this.message);
-}
-
-class PetLoaded extends PetState {
-  final List<Pet> pets;
-  const PetLoaded(this.pets);
 }

@@ -4,6 +4,7 @@ import 'package:frontend/bloc/chat/chat_bloc.dart';
 import 'package:frontend/bloc/clinic/clinic_bloc.dart';
 import 'package:frontend/bloc/petschedule/pet_schedule_bloc.dart';
 import 'package:frontend/bloc/vet/vet_bloc.dart';
+import 'package:frontend/models/pet_model.dart';
 import 'package:frontend/services/chat_service.dart';
 import 'package:frontend/services/clinic_service.dart';
 import 'package:frontend/services/pet_service.dart';
@@ -16,7 +17,7 @@ import 'package:go_router/go_router.dart';
 import 'package:frontend/bloc/user/user_bloc.dart';
 import 'package:frontend/bloc/pet/pet_bloc.dart';
 import 'package:frontend/models/vet_model.dart';
-import 'package:frontend/views/pages/pages.dart'; // pastikan ini mengimpor semua page
+import 'package:frontend/views/pages/pages.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,84 +31,65 @@ class MyApp extends StatelessWidget {
     final GoRouter router = GoRouter(
       initialLocation: '/',
       routes: [
-        GoRoute(
-          path: '/',
-          builder: (context, state) => const SplashScreen(),
-        ),
-        GoRoute(
-          path: '/onboarding',
-          builder: (context, state) => OnboardingScreen(),
-        ),
-        GoRoute(
-          path: '/login',
-          builder: (context, state) => const LoginScreen(),
-        ),
-        GoRoute(
-          path: '/register',
-          builder: (context, state) => const RegisterScreen(),
-        ),
-        GoRoute(
-          path: '/choosepet',
-          builder: (context, state) => const ChoosePetPage(),
-        ),
-        GoRoute(
-          path: '/dashboard',
-          builder: (context, state) => const HomePage(),
-        ),
-        GoRoute(
-          path: '/profile',
-          builder: (context, state) => const ProfilePage(),
-        ),
-        GoRoute(
-          path: '/edit-profile',
-          builder: (context, state) => const EditProfilePage(),
-        ),
-        GoRoute(
-          path: '/askai',
-          builder: (context, state) => const AskAIWelcome(),
-        ),
-        GoRoute(
-          path: '/myexpenses',
-          builder: (context, state) => const MyExpensesPage(),
-        ),
-        GoRoute(
-          path: '/need-vet',
-          builder: (context, state) => VetListPage(),
-        ),
+        GoRoute(path: '/', builder: (_, __) => const SplashScreen()),
+        GoRoute(path: '/onboarding', builder: (_, __) => OnboardingScreen()),
+        GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
+        GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
+        GoRoute(path: '/choosepet', builder: (_, __) => const ChoosePetPage()),
+        GoRoute(path: '/dashboard', builder: (_, __) => const HomePage()),
+        GoRoute(path: '/profile', builder: (_, __) => const ProfilePage()),
+        GoRoute(path: '/edit-profile', builder: (_, __) => const EditProfilePage()),
+        GoRoute(path: '/askai', builder: (_, __) => const AskAIWelcome()),
+        GoRoute(path: '/myexpenses', builder: (_, __) => const MyExpensesPage()),
+        GoRoute(path: '/need-vet', builder: (_, __) => VetListPage()),
         GoRoute(
           path: '/detail-vet',
-          builder: (context, state) {
-            final vet = state.extra as VetModel;
-            return VetDetailPage(vet: vet);
-          },
+          builder: (_, state) => VetDetailPage(vet: state.extra as VetModel),
         ),
         GoRoute(
-          path: '/chat-vet',
-          builder: (context, state) {
+          path: '/pet-detail',
+          builder: (_, state) {
             final extra = state.extra;
-
-            if (extra == null || extra is! Map<String, dynamic> || 
-                extra['vet'] == null || extra['chat'] == null) {
-              // redirect ke /need-vet jika data tidak lengkap
-              Future.microtask(() => context.go('/need-vet'));
+            if (extra == null || extra is! Pet) {
+              Future.microtask(() => _.go('/dashboard'));
               return const Scaffold(
                 body: Center(child: CircularProgressIndicator()),
               );
             }
-
-            final vet = extra['vet'] as VetModel;
-            final chat = extra['chat']; // sesuaikan dengan tipe ChatModel Anda
-            return ChatPage(vet: vet, chat: chat);
+            return PetDetailPage(pet: extra);
           },
         ),
         GoRoute(
-          path: '/vet-dashboard',
-          builder: (context, state) => const VetDashboardPage(),
+          path: '/edit-pet',
+          builder: (_, state) {
+            final extra = state.extra;
+            if (extra == null || extra is! Pet) {
+              Future.microtask(() => _.go('/dashboard'));
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+            return PetEditPage(pet: extra);
+          },
         ),
         GoRoute(
-          path: '/vet-chats',
-          builder: (context, state) => const VetChatListPage(),
+          path: '/chat-vet',
+          builder: (_, state) {
+            final extra = state.extra;
+            if (extra == null ||
+                extra is! Map<String, dynamic> ||
+                extra['vet'] == null ||
+                extra['chat'] == null) {
+              Future.microtask(() => _.go('/need-vet'));
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+            return ChatPage(vet: extra['vet'], chat: extra['chat']);
+          },
         ),
+        GoRoute(path: '/vet-dashboard', builder: (_, __) => const VetDashboardPage()),
+        GoRoute(path: '/vet-chats', builder: (_, __) => const VetChatListPage()),
       ],
     );
 
@@ -130,58 +112,45 @@ class MyApp extends StatelessWidget {
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
-
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
-      body: const Center(
-        child: Text('Login Page - Not implemented yet'),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: const Text('Login')),
+        body: const Center(child: Text('Login Page - Not implemented yet')),
+      );
 }
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
-
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Dashboard')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Dashboard Page - Not implemented yet'),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => context.go('/profile'),
-              child: const Text('Go to Profile'),
-            ),
-          ],
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: const Text('Dashboard')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('Dashboard Page - Not implemented yet'),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => context.go('/profile'),
+                child: const Text('Go to Profile'),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 }
 
 class SubscriptionPage extends StatelessWidget {
   const SubscriptionPage({super.key});
-
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Subscription'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Subscription'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.pop(),
+          ),
         ),
-      ),
-      body: const Center(
-        child: Text('Subscription Page - Not implemented yet'),
-      ),
-    );
-  }
+        body: const Center(child: Text('Subscription Page - Not implemented yet')),
+      );
 }

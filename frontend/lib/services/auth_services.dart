@@ -1,105 +1,96 @@
+import 'dart:async';                                // ← untuk TimeoutException
 import 'dart:convert';
 import 'dart:io';
+import 'package:frontend/services/url.dart';        // pastikan file url.dart ada di folder services
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 
 class AuthServices {
-  static const String baseUrl = 'http://192.168.241.117:8080/api/users';
   static const Duration timeout = Duration(seconds: 10);
 
+  /* ────── LOGIN ────── */
   Future<User> login(String email, String password) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/login'),
-        body: {'email': email, 'password': password},
-      ).timeout(timeout);
+      final response = await http
+          .post(
+            Uri.parse('$kUserAPI/login'),
+            body: {'email': email, 'password': password},
+          )
+          .timeout(timeout);
 
-      if (response.statusCode == 200) {
-        try {
-          final data = json.decode(response.body);
-          final user = User.fromJson(data);
-
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('userid', user.id);        // simpan id lokal di 'userid'
-          await prefs.setString('uid', user.uid);           // simpan uid global di 'uid'
-          await prefs.setString('name', user.name);
-          await prefs.setString('email', user.email);
-          await prefs.setString('phonenumber', user.phone);
-          await prefs.setString('profileImageUrl', user.profileImageUrl ?? '');
-          await prefs.setBool('isPremium', user.isPremium);
-
-          return user;
-        } catch (e) {
-          throw Exception('Format respons tidak valid dari server');
-        }
-      } else {
-        throw Exception(_parseError(response));
-      }
+      final data  = _validateResponse(response);
+      final user  = User.fromJson(data);
+      await _saveUserToPrefs(user);
+      return user;
     } on SocketException {
       throw Exception('Tidak dapat terhubung ke server. Periksa koneksi internet Anda.');
-    } on http.ClientException {
-      throw Exception('Gagal terhubung ke server');
+    } on TimeoutException {
+      throw Exception('Koneksi timeout. Coba lagi.');
     } catch (e) {
-      if (e.toString().contains('TimeoutException')) {
-        throw Exception('Koneksi timeout. Coba lagi.');
-      }
-      rethrow;
+      rethrow; // kesalahan lain diteruskan
     }
   }
 
+  /* ────── REGISTER ────── */
   Future<User> register(String name, String email, String password) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/register'),
-        body: {'name': name, 'email': email, 'password': password},
-      ).timeout(timeout);
+      final response = await http
+          .post(
+            Uri.parse('$kUserAPI/register'),
+            body: {'name': name, 'email': email, 'password': password},
+          )
+          .timeout(timeout);
 
-      if (response.statusCode == 200) {
-        try {
-          final data = json.decode(response.body);
-          return User.fromJson(data);
-        } catch (e) {
-          throw Exception('Format respons tidak valid dari server');
-        }
-      } else {
-        throw Exception(_parseError(response));
-      }
+      final data = _validateResponse(response);
+      return User.fromJson(data);
     } on SocketException {
       throw Exception('Tidak dapat terhubung ke server. Periksa koneksi internet Anda.');
-    } on http.ClientException {
-      throw Exception('Gagal terhubung ke server');
+    } on TimeoutException {
+      throw Exception('Koneksi timeout. Coba lagi.');
     } catch (e) {
-      if (e.toString().contains('TimeoutException')) {
-        throw Exception('Koneksi timeout. Coba lagi.');
-      }
       rethrow;
     }
   }
 
-  String _parseError(http.Response response) {
+  /* ────── Helper: cache user ────── */
+  Future<void> _saveUserToPrefs(User u) async {
+    final p = await SharedPreferences.getInstance();
+    await p.setString('userid',          u.id);
+    await p.setString('uid',             u.uid);
+    await p.setString('name',            u.name);
+    await p.setString('email',           u.email);
+    await p.setString('phonenumber',     u.phone);
+    await p.setString('profileImageUrl', u.profileImageUrl ?? '');
+    await p.setBool  ('isPremium',       u.isPremium);
+  }
+
+  /* ────── Helper: validasi respons ────── */
+  dynamic _validateResponse(http.Response res) {
+    if (res.statusCode == 200) {
+      try {
+        return json.decode(res.body);
+      } catch (_) {
+        throw Exception('Format respons tidak valid dari server');
+      }
+    }
+    throw Exception(_parseError(res));
+  }
+
+  /* ────── Helper: parsing error ────── */
+  String _parseError(http.Response res) {
     try {
-      final data = json.decode(response.body);
-      if (data is Map && data['message'] != null) {
-        return data['message'];
-      }
-      return response.body.isNotEmpty ? response.body : 'Terjadi kesalahan pada server';
-    } catch (_) {
-      if (response.body.isNotEmpty) {
-        return response.body;
-      }
-      switch (response.statusCode) {
-        case 400:
-          return 'Data yang dikirim tidak valid';
-        case 401:
-          return 'Email atau password salah';
-        case 409:
-          return 'Email atau username sudah digunakan';
-        case 500:
-          return 'Terjadi kesalahan pada server';
-        default:
-          return 'Terjadi kesalahan tidak terduga (${response.statusCode})';
-      }
+      final data = json.decode(res.body);
+      if (data is Map && data['message'] != null) return data['message'];
+    } catch (_) {}
+    if (res.body.isNotEmpty) return res.body;
+
+    switch (res.statusCode) {
+      case 400: return 'Data yang dikirim tidak valid';
+      case 401: return 'Email atau password salah';
+      case 409: return 'Email atau username sudah digunakan';
+      case 500: return 'Terjadi kesalahan pada server';
+      default : return 'Terjadi kesalahan tidak terduga (${res.statusCode})';
     }
   }
 }

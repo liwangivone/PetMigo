@@ -83,3 +83,5 @@ part 'vets_list_page.dart';
 part 'vet_detail_page.dart';
 part 'vet_dashboard_page.dart';
 part 'vet_chat_list_page.dart';
+part 'pet_detail_page.dart';
+part 'edit_pet_form.dart';
