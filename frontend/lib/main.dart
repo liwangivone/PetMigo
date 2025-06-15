@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/bloc/chat/chat_bloc.dart';
+import 'package:frontend/bloc/clinic/clinic_bloc.dart';
 import 'package:frontend/bloc/petschedule/pet_schedule_bloc.dart';
+import 'package:frontend/bloc/vet/vet_bloc.dart';
+import 'package:frontend/services/chat_service.dart';
+import 'package:frontend/services/clinic_service.dart';
 import 'package:frontend/services/pet_service.dart';
 import 'package:frontend/services/petschedules_service.dart';
 import 'package:frontend/services/user_service.dart';
+import 'package:frontend/services/vet_service.dart';
+import 'package:frontend/views/pages/vet_chat_page.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:frontend/bloc/user/user_bloc.dart';
 import 'package:frontend/bloc/pet/pet_bloc.dart';
-
-import 'package:frontend/models/vet_models.dart';
-import 'package:frontend/views/pages/pages.dart';
+import 'package:frontend/models/vet_model.dart';
+import 'package:frontend/views/pages/pages.dart'; // pastikan ini mengimpor semua page
 
 void main() {
   runApp(const MyApp());
@@ -56,18 +62,18 @@ class MyApp extends StatelessWidget {
           path: '/edit-profile',
           builder: (context, state) => const EditProfilePage(),
         ),
-          GoRoute(
+        GoRoute(
           path: '/askai',
           builder: (context, state) => const AskAIWelcome(),
         ),
         GoRoute(
-          path: '/myexpenses', 
+          path: '/myexpenses',
           builder: (context, state) => const MyExpensesPage(),
         ),
         GoRoute(
-            path: '/need-vet',
-            builder: (context, state) => VetListPage(),
-          ),
+          path: '/need-vet',
+          builder: (context, state) => VetListPage(),
+        ),
         GoRoute(
           path: '/detail-vet',
           builder: (context, state) {
@@ -78,8 +84,20 @@ class MyApp extends StatelessWidget {
         GoRoute(
           path: '/chat-vet',
           builder: (context, state) {
-            final vet = state.extra as VetModel;
-            return ChatPage(vet: vet);
+            final extra = state.extra;
+
+            if (extra == null || extra is! Map<String, dynamic> || 
+                extra['vet'] == null || extra['chat'] == null) {
+              // redirect ke /need-vet jika data tidak lengkap
+              Future.microtask(() => context.go('/need-vet'));
+              return const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
+              );
+            }
+
+            final vet = extra['vet'] as VetModel;
+            final chat = extra['chat']; // sesuaikan dengan tipe ChatModel Anda
+            return ChatPage(vet: vet, chat: chat);
           },
         ),
         GoRoute(
@@ -98,6 +116,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => UserBloc(userService: UserService())),
         BlocProvider(create: (_) => PetBloc(PetService())),
         BlocProvider(create: (_) => PetScheduleBloc(PetScheduleService())),
+        BlocProvider(create: (_) => VetBloc(VetService())),
+        BlocProvider(create: (_) => ClinicBloc(ClinicsService())),
+        BlocProvider(create: (_) => ChatBloc(ChatService())),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

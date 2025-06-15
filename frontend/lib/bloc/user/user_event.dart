@@ -33,3 +33,4 @@ class UpdateProfileImage extends UserEvent {
   @override
   List<Object?> get props => [imageUrl];
 }
+

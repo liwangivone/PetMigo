@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.group4.petmigo.DTO.VetDTO;
 import com.group4.petmigo.Repository.VetRepository;
+import com.group4.petmigo.models.entities.NeedVet.Clinics.Clinics;
 import com.group4.petmigo.models.entities.NeedVet.Vet.Vet;
 import com.group4.petmigo.models.entities.User.status;
 
@@ -15,51 +16,55 @@ public class VetService {
 
     private final VetRepository vetRepository;
 
-    // Constructor injection agar vetRepository tidak null
     public VetService(VetRepository vetRepository) {
         this.vetRepository = vetRepository;
     }
 
-    public VetDTO register(Vet vet){
-
-        if (vetRepository.existsByEmail(vet.getEmail())) {
+    // ─────────── register ───────────
+    public VetDTO register(Vet vet) {
+        if (vetRepository.existsByEmail(vet.getEmail()))
             throw new RuntimeException("Email sudah digunakan.");
-        }
-        if (vetRepository.existsByName(vet.getName())) {
+        if (vetRepository.existsByName(vet.getName()))
             throw new RuntimeException("Username sudah digunakan.");
-        }
 
         vet.setStatus(status.offline);
-        vet.setClinics(null);
+        vet.setClinics(null);               // vet awalnya belum terikat klinik
 
-        Vet saved = vetRepository.save(vet);
-        return toDTO(saved);
+        return toDTO(vetRepository.save(vet));
     }
 
-    public VetDTO login(String email, String password){
+    // ─────────── login ───────────
+    public VetDTO login(String email, String password) {
         Vet vet = vetRepository.findByEmail(email);
-        if (vet != null && vet.getPassword().equals(password)) {
+        if (vet != null && vet.getPassword().equals(password))
             return toDTO(vet);
-        }
         throw new RuntimeException("email atau password salah");
     }
 
+    // ─────────── get all ───────────
     public List<VetDTO> getAllVets() {
-    List<Vet> vets = vetRepository.findAll();
-    return vets.stream()
-               .map(this::toDTO)
-               .collect(Collectors.toList());
-}
+        return vetRepository.findAll()
+                            .stream()
+                            .map(this::toDTO)
+                            .collect(Collectors.toList());
+    }
 
-    private VetDTO toDTO(Vet vet){
+    // ─────────── mapper ───────────
+    private VetDTO toDTO(Vet vet) {
         VetDTO dto = new VetDTO();
-        dto.setVetid(vet.getVetid());         // perbaikan: set ke dto, bukan vet
+        dto.setVetid(vet.getVetid());
         dto.setName(vet.getName());
         dto.setEmail(vet.getEmail());
         dto.setSpecialization(vet.getSpecialization());
         dto.setExperienceYears(vet.getExperienceYears());
         dto.setOverview(vet.getOverview());
-        dto.setSchedule(vet.getSchedule());;
+        dto.setSchedule(vet.getSchedule());
+
+        Clinics cl = vet.getClinics();          // relasi Many‑to‑One
+        if (cl != null) {
+            dto.setClinicId(cl.getClinicsid());
+            dto.setClinicName(vet.getClinics().getName());   // ← inilah kuncinya
+        }
         return dto;
     }
 }

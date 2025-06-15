@@ -1,4 +1,5 @@
 import 'package:frontend/models/petschedules_model.dart';
+import 'package:intl/intl.dart'; // 👈 diperlukan untuk format LocalDate
 
 class Pet {
   final String id;
@@ -39,13 +40,15 @@ class Pet {
     );
   }
 
+  static final DateFormat _dateFmt = DateFormat('yyyy-MM-dd'); // ✅ untuk LocalDate
+
   Map<String, dynamic> toJson() {
     return {
       'petid': id,
       'name': name,
       'gender': gender,
       'type': type,
-      'birthdate': birthdate.toString(),
+      'birthdate': _dateFmt.format(birthdate), // ✅ pastikan bentuk "2025-06-18"
       'breed': breed,
       'weight': weight,
       'color': color,
