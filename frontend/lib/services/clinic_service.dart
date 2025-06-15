@@ -1,18 +1,19 @@
 import 'dart:convert';
+import 'package:frontend/services/url.dart';
 import 'package:http/http.dart' as http;
 import '../models/clinic_model.dart';
 
 class ClinicsService {
   final String baseUrl;
-  const ClinicsService({this.baseUrl = 'http://localhost:8080/api/clinics'});
+  const ClinicsService({this.baseUrl = kClinicAPI}); // ← ganti default
 
   /* ────── CRUD ────── */
 
-  Future<ClinicModel> createClinic(ClinicModel data) async {
+  Future<ClinicModel> createClinic(ClinicModel d) async {
     final res = await http.post(
       Uri.parse(baseUrl),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(data.toJson()),
+      body: jsonEncode(d.toJson()),
     );
     return ClinicModel.fromJson(jsonDecode(res.body));
   }
@@ -28,11 +29,11 @@ class ClinicsService {
     return ClinicModel.fromJson(jsonDecode(res.body));
   }
 
-  Future<ClinicModel> updateClinic(String id, ClinicModel data) async {
+  Future<ClinicModel> updateClinic(String id, ClinicModel d) async {
     final res = await http.put(
       Uri.parse('$baseUrl/$id'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(data.toJson()),
+      body: jsonEncode(d.toJson()),
     );
     return ClinicModel.fromJson(jsonDecode(res.body));
   }

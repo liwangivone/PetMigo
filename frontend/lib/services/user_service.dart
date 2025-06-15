@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'package:frontend/models/user_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:frontend/services/url.dart';
 
 class UserService {
   final String baseUrl;
-  UserService({this.baseUrl = 'http://192.168.241.117:8080/api/users'});
+  UserService({this.baseUrl = kUserAPI});
 
   Future<Map<String, dynamic>> getUserProfile(String userId) async {
     try {

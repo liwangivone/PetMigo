@@ -4,8 +4,10 @@ import com.group4.petmigo.models.entities.User.User;
 import com.group4.petmigo.models.entities.pet.Pet;
 import com.group4.petmigo.Repository.PetRepository;
 import com.group4.petmigo.Repository.UserRepository;
+import com.group4.petmigo.Repository.PetScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional; // ✅ Tambahkan ini
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +20,9 @@ public class PetService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PetScheduleRepository petScheduleRepository;
 
     // Create Pet dengan userId
     public Pet createPet(Long userId, Pet pet) {
@@ -49,13 +54,16 @@ public class PetService {
         pet.setBirthdate(updatedPet.getBirthdate());
         pet.setColor(updatedPet.getColor());
         pet.setWeight(updatedPet.getWeight());
-        // User tidak diupdate di sini, kecuali ingin support pindah user
         return petRepository.save(pet);
     }
 
-    // Delete Pet
-    public void deletePet(Long petId) {
-        petRepository.deleteById(petId);
+    // Delete Pet dan semua petSchedule terkait
+    @Transactional // ✅ Ditambahkan agar EntityManager aktif
+    public void deletePet(Long petid) {
+        // Hapus semua jadwal yang terkait dengan Pet terlebih dahulu
+        petScheduleRepository.deleteByPet_Petid(petid);
+        // Lalu hapus Pet-nya
+        petRepository.deleteById(petid);
     }
 
     // List all pets for a user

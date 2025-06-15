@@ -10,6 +10,7 @@ class PetScheduleBloc extends Bloc<PetScheduleEvent, PetScheduleState> {
 
   PetScheduleBloc(this.petScheduleService) : super(PetScheduleInitial()) {
     on<LoadPetSchedules>(_onLoadPetSchedules);
+    on<LoadPetSchedulesByPetId>(_onLoadPetSchedulesByPetId);
   }
 
   Future<void> _onLoadPetSchedules(
@@ -48,7 +49,8 @@ class PetScheduleBloc extends Bloc<PetScheduleEvent, PetScheduleState> {
           final PetSchedule schedule = PetSchedule(
             id: s['schedule_id'].toString(),
             category: PetScheduleCategory.values.firstWhere(
-              (e) => e.name.toLowerCase() == s['category'].toString().toLowerCase(),
+              (e) => e.name.toLowerCase() ==
+                  s['category'].toString().toLowerCase(),
               orElse: () => PetScheduleCategory.Others,
             ),
             expense: expense,
@@ -69,5 +71,45 @@ class PetScheduleBloc extends Bloc<PetScheduleEvent, PetScheduleState> {
       emit(PetScheduleError(e.toString()));
     }
   }
-}
 
+  Future<void> _onLoadPetSchedulesByPetId(
+    LoadPetSchedulesByPetId event,
+    Emitter<PetScheduleState> emit,
+  ) async {
+    emit(PetScheduleLoading());
+    try {
+      final rawList = await petScheduleService.getSchedulesByPetId(event.petId);
+
+      final List<PetSchedule> parsed = rawList.map<PetSchedule>((s) {
+        final rawDate = s['date'];
+        final DateTime date = rawDate is String
+            ? DateTime.tryParse(rawDate) ?? DateTime.now()
+            : DateTime.now();
+
+        final int expense = (s['expense'] ?? 0) is int
+            ? s['expense']
+            : int.tryParse(s['expense'].toString()) ?? 0;
+
+        return PetSchedule(
+          id: s['schedule_id'].toString(),
+          category: PetScheduleCategory.values.firstWhere(
+            (e) => e.name.toLowerCase() ==
+                s['category'].toString().toLowerCase(),
+            orElse: () => PetScheduleCategory.Others,
+          ),
+          expense: expense,
+          description: s['description'] ?? '',
+          date: date,
+          petId: s['petid']?.toString() ?? event.petId,
+          petName: s['petName'] ?? '',
+          petType: s['petType'] ?? '',
+        );
+      }).toList();
+
+      emit(PetScheduleLoaded(parsed));
+    } catch (e, st) {
+      print("Error in PetScheduleBloc (byPetId): $e\n$st");
+      emit(PetScheduleError(e.toString()));
+    }
+  }
+}

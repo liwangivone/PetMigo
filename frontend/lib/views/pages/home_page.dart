@@ -8,12 +8,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String selectedType = "All";
+  String selectedType = 'All';
   bool showAllSchedules = false;
 
   @override
   void initState() {
     super.initState();
+    _loadData();
+  }
+
+  void _loadData() {
     context.read<UserBloc>().add(GetUserData());
     context.read<PetBloc>().add(GetPetData());
     context.read<PetScheduleBloc>().add(LoadPetSchedules());
@@ -28,41 +32,34 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: BlocBuilder<UserBloc, UserState>(
           builder: (context, userState) {
-            if (userState is UserLoading) {
+            if (userState is! UserLoaded) {
               return const Center(child: CircularProgressIndicator());
-            } else if (userState is UserLoaded) {
-              return BlocBuilder<PetBloc, PetState>(
-                builder: (context, petState) {
-                  if (petState is PetLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (petState is PetLoaded) {
-                    return BlocBuilder<PetScheduleBloc, PetScheduleState>(
-                      builder: (context, scheduleState) {
-                        if (scheduleState is PetScheduleLoading) {
-                          return const Center(child: CircularProgressIndicator());
-                        } else if (scheduleState is PetScheduleLoaded) {
-                          return _buildContent(userState.user, petState.pets, scheduleState.schedules);
-                        } else if (scheduleState is PetScheduleError) {
-                          return Center(child: Text(scheduleState.message));
-                        } else {
-                          return const Center(child: Text("Failed to load schedules."));
-                        }
-                      },
-                    );
-                  } else {
-                    return const Center(child: Text("Failed to load pets."));
-                  }
-                },
-              );
-            } else {
-              return const Center(child: Text("Failed to load user data."));
             }
+            return BlocBuilder<PetBloc, PetState>(
+              builder: (context, petState) {
+                if (petState is! PetLoaded) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return BlocBuilder<PetScheduleBloc, PetScheduleState>(
+                  builder: (context, schedState) {
+                    if (schedState is! PetScheduleLoaded) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    return _buildContent(
+                      userState.user,
+                      petState.pets,
+                      schedState.schedules,
+                    );
+                  },
+                );
+              },
+            );
           },
         ),
       ),
       bottomNavigationBar: const BottomNavbar(currentIndex: 0),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => GoRouter.of(context).go('/choosepet'),
+        onPressed: () => context.go('/choosepet'),
         backgroundColor: Colors.blue,
         child: const Icon(Icons.add),
       ),
@@ -70,19 +67,20 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildContent(User user, List<Pet> pets, List<PetSchedule> schedules) {
-    final filteredPets = selectedType.toLowerCase() == "all"
+    final filteredPets = selectedType.toLowerCase() == 'all'
         ? pets
         : pets.where((p) => p.type.toLowerCase() == selectedType.toLowerCase()).toList();
 
     final now = DateTime.now();
     final upcoming = schedules.where((s) => s.date.isAfter(now)).toList()
-      ..sort((a, b) => b.date.compareTo(a.date)); // DESC: jauh → dekat
+      ..sort((a, b) => a.date.compareTo(b.date));
     final past = schedules.where((s) => s.date.isBefore(now)).toList()
-      ..sort((a, b) => b.date.compareTo(a.date)); // DESC: baru → lama
+      ..sort((a, b) => b.date.compareTo(a.date));
+
     final approaching = upcoming
         .where((s) => s.date.difference(now).inDays <= 3)
         .toList()
-      ..sort((a, b) => a.date.compareTo(b.date)); // ASC: terdekat → terjauh
+      ..sort((a, b) => a.date.compareTo(b.date));
     final limitedApproaching = approaching.take(5).toList();
 
     return Column(
@@ -97,56 +95,44 @@ class _HomePageState extends State<HomePage> {
           limitedApproaching: limitedApproaching,
           past: past,
           showAll: showAllSchedules,
-          toggleShowAll: () {
-            if (!mounted) return;
-            setState(() => showAllSchedules = !showAllSchedules);
-          },
+          toggleShowAll: () => setState(() => showAllSchedules = !showAllSchedules),
         ),
         const SizedBox(height: 20),
-        const Text("My pets", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        Row(children: ["All", "Cat", "Dog"].map(_chip).toList()),
+        const Text('My pets', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Row(children: ['All', 'Cat', 'Dog'].map(_chip).toList()),
         const SizedBox(height: 10),
         filteredPets.isEmpty
             ? const Padding(
-                padding: EdgeInsets.all(12.0),
-                child: Text("Kamu belum punya hewan peliharaan.", 
-                    style: TextStyle(color: Colors.grey)),
+                padding: EdgeInsets.all(12),
+                child: Text('Kamu belum punya hewan peliharaan.', style: TextStyle(color: Colors.grey)),
               )
             : Column(children: filteredPets.map(_petCard).toList()),
       ],
     );
   }
 
-  Widget _header(User user) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Hello, ${user.name}!", 
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              Text("Your pets miss you, check it now", 
-                  style: TextStyle(color: Colors.grey[600])),
-            ],
+  Widget _header(User user) => Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Hello, ${user.name}!', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                Text('Your pets miss you, check it now', style: TextStyle(color: Colors.grey[600])),
+              ],
+            ),
           ),
-        ),
-        GestureDetector(
-          onTap: () => GoRouter.of(context).go('/profile'),
-          child: CircleAvatar(
-            radius: 26,
-            backgroundColor: Colors.pink[100],
-            backgroundImage: user.profileImageUrl != null 
-                ? NetworkImage(user.profileImageUrl!) 
-                : null,
-            child: user.profileImageUrl == null 
-                ? Icon(Icons.person, color: Colors.red[900]) 
-                : null,
+          GestureDetector(
+            onTap: () => context.go('/profile'),
+            child: CircleAvatar(
+              radius: 26,
+              backgroundColor: Colors.pink[100],
+              backgroundImage: user.profileImageUrl != null ? NetworkImage(user.profileImageUrl!) : null,
+              child: user.profileImageUrl == null ? Icon(Icons.person, color: Colors.red[900]) : null,
+            ),
           ),
-        ),
-      ],
-    );
-  }
+        ],
+      );
 
   Widget _chip(String label) {
     final isSelected = selectedType.toLowerCase() == label.toLowerCase();
@@ -155,11 +141,8 @@ class _HomePageState extends State<HomePage> {
       child: ChoiceChip(
         label: Text(label),
         selected: isSelected,
-        onSelected: (_) {
-          if (!mounted) return;
-          setState(() => selectedType = label);
-        },
         selectedColor: Colors.blue[100],
+        onSelected: (_) => setState(() => selectedType = label),
       ),
     );
   }
@@ -170,82 +153,71 @@ class _HomePageState extends State<HomePage> {
     required List<PetSchedule> past,
     required bool showAll,
     required VoidCallback toggleShowAll,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text("Upcoming Schedules", 
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            GestureDetector(
-              onTap: toggleShowAll,
-              child: Text(
-                showAll ? "Show limited" : "View all",
-                style: const TextStyle(
-                    fontSize: 14, 
-                    color: Colors.blue, 
-                    fontWeight: FontWeight.w500),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        if (upcoming.isEmpty)
-          const Text("No upcoming schedules.")
-        else if (!showAll)
-          limitedApproaching.isEmpty
-              ? const Text("No upcoming schedules in 3 days.")
-              : Column(children: limitedApproaching.map(_scheduleCardByCategory).toList())
-        else
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+  }) =>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Upcoming schedules", 
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
-              const SizedBox(height: 6),
-              ...upcoming.map(_scheduleCardByCategory),
-              const SizedBox(height: 16),
-              const Text("Past schedules", 
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-              const SizedBox(height: 6),
-              past.isEmpty
-                  ? const Text("No past schedules.")
-                  : Column(children: past.map(_scheduleCardByCategory).toList()),
+              const Text('Upcoming Schedules', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              GestureDetector(
+                onTap: toggleShowAll,
+                child: Text(
+                  showAll ? 'Show limited' : 'View all',
+                  style: const TextStyle(fontSize: 14, color: Colors.blue, fontWeight: FontWeight.w500),
+                ),
+              ),
             ],
           ),
-      ],
-    );
-  }
+          const SizedBox(height: 10),
+          if (showAll) ...[
+            const Text('Upcoming schedules', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+            const SizedBox(height: 6),
+            upcoming.isEmpty
+                ? const Text('No upcoming schedules.')
+                : Column(children: upcoming.map(_scheduleCard).toList()),
+            const SizedBox(height: 16),
+            const Text('Past schedules', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+            const SizedBox(height: 6),
+            past.isEmpty ? const Text('No past schedules.') : Column(children: past.map(_scheduleCard).toList()),
+          ] else ...[
+            if (upcoming.isEmpty)
+              const Text('No upcoming schedules.')
+            else if (limitedApproaching.isEmpty)
+              const Text('No upcoming schedules in 3 days.')
+            else
+              Column(children: limitedApproaching.map(_scheduleCard).toList()),
+          ],
+        ],
+      );
 
-  Widget _scheduleCardByCategory(PetSchedule schedule) {
+  Widget _scheduleCard(PetSchedule schedule) {
     IconData icon;
     Color color;
-    String label = _formatEnumLabel(schedule.category.name);
+    final label = _capitalize(schedule.category.name);
 
     switch (label) {
-      case "Vaccination":
+      case 'Vaccination':
         icon = Icons.medical_services;
         color = Colors.red;
         break;
-      case "Grooming":
+      case 'Grooming':
         icon = Icons.cut;
         color = Colors.blue;
         break;
-      case "Food":
+      case 'Food':
         icon = Icons.restaurant;
         color = Colors.green;
         break;
-      case "Toys":
+      case 'Toys':
         icon = Icons.toys;
         color = Colors.orange;
         break;
-      case "Snack":
+      case 'Snack':
         icon = Icons.fastfood;
         color = Colors.purple;
         break;
-      case "Others":
       default:
         icon = Icons.event_note;
         color = Colors.grey;
@@ -254,20 +226,14 @@ class _HomePageState extends State<HomePage> {
 
     return Card(
       child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: color.withOpacity(0.2),
-          child: Icon(icon, color: color),
-        ),
+        leading: CircleAvatar(backgroundColor: color.withOpacity(0.2), child: Icon(icon, color: color)),
         title: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text(_formatScheduleDate(schedule)),
       ),
     );
   }
 
-  String _formatEnumLabel(String enumName) {
-    final lower = enumName.toLowerCase();
-    return lower[0].toUpperCase() + lower.substring(1);
-  }
+  String _capitalize(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1).toLowerCase();
 
   String _formatScheduleDate(PetSchedule s) {
     final now = DateTime.now();
@@ -279,59 +245,52 @@ class _HomePageState extends State<HomePage> {
     if (localDate.isAfter(now)) {
       String label;
       if (diffDays == 0) {
-        label = "Today";
+        label = 'Today';
       } else if (diffDays == 1) {
-        label = "Tomorrow";
-      } else if (diffDays <= 6) {
+        label = 'Tomorrow';
+      } else if (diffDays < 7) {
         label = DateFormat('EEEE').format(localDate);
       } else {
         label = DateFormat('dd MMM yyyy').format(localDate);
       }
-
-      final timeString = DateFormat('h:mm a').format(localDate);
-      return "$label, $timeString - ${s.petName}";
-    } else {
-      final diff = now.difference(localDate);
-      if (diff.inDays >= 365) {
-        final years = (diff.inDays / 365).floor();
-        return "$years ${years == 1 ? 'year' : 'years'} ago - ${s.petName}";
-      } else if (diff.inDays >= 30) {
-        final months = (diff.inDays / 30).floor();
-        return "$months ${months == 1 ? 'month' : 'months'} ago - ${s.petName}";
-      } else if (diff.inDays >= 1) {
-        return "${diff.inDays} ${diff.inDays == 1 ? 'day' : 'days'} ago - ${s.petName}";
-      } else if (diff.inHours >= 1) {
-        return "${diff.inHours} ${diff.inHours == 1 ? 'hour' : 'hours'} ago - ${s.petName}";
-      } else {
-        return "${diff.inMinutes} ${diff.inMinutes == 1 ? 'minute' : 'minutes'} ago - ${s.petName}";
-      }
+      return '$label, ${DateFormat('h:mm a').format(localDate)} - ${s.petName}';
     }
+
+    final diff = now.difference(localDate);
+    if (diff.inDays >= 365) {
+      final years = (diff.inDays / 365).floor();
+      return '$years ${years == 1 ? 'year' : 'years'} ago - ${s.petName}';
+    } else if (diff.inDays >= 30) {
+      final months = (diff.inDays / 30).floor();
+      return '$months ${months == 1 ? 'month' : 'months'} ago - ${s.petName}';
+    } else if (diff.inDays >= 1) {
+      return '${diff.inDays} ${diff.inDays == 1 ? 'day' : 'days'} ago - ${s.petName}';
+    } else if (diff.inHours >= 1) {
+      return '${diff.inHours} ${diff.inHours == 1 ? 'hour' : 'hours'} ago - ${s.petName}';
+    }
+    return '${diff.inMinutes} ${diff.inMinutes == 1 ? 'minute' : 'minutes'} ago - ${s.petName}';
   }
 
   Widget _petCard(Pet pet) {
-    final isFemale = pet.gender.toLowerCase() == "female";
+    final isFemale = pet.gender.toLowerCase() == 'female';
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
+        onTap: () => context.go('/pet-detail', extra: pet),
         leading: CircleAvatar(
           radius: 26,
-          backgroundImage: AssetImage(
-            pet.type.toLowerCase() == "cat"
-                ? 'assets/images/cat.png'
-                : 'assets/images/dog.png',
-          ),
+          backgroundImage: AssetImage(pet.type.toLowerCase() == 'cat'
+              ? 'assets/images/cat.png'
+              : 'assets/images/dog.png'),
         ),
         title: Text(pet.name, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(pet.breed ?? "-"),
+            Text(pet.breed ?? '-'),
             Row(
               children: [
-                Icon(
-                  isFemale ? Icons.female : Icons.male, 
-                  size: 14, 
-                  color: isFemale ? Colors.pink : Colors.blue),
+                Icon(isFemale ? Icons.female : Icons.male, size: 14, color: isFemale ? Colors.pink : Colors.blue),
                 const SizedBox(width: 4),
                 Text(pet.gender),
                 const SizedBox(width: 10),
@@ -349,11 +308,10 @@ class _HomePageState extends State<HomePage> {
   String _calculateAge(DateTime birthdate) {
     final now = DateTime.now();
     int age = now.year - birthdate.year;
-    if (now.month < birthdate.month || 
-        (now.month == birthdate.month && now.day < birthdate.day)) {
+    if (now.month < birthdate.month || (now.month == birthdate.month && now.day < birthdate.day)) {
       age--;
     }
-    return "$age years";
+    return '$age years';
   }
 
   Widget _premiumCard() {
@@ -362,16 +320,13 @@ class _HomePageState extends State<HomePage> {
       decoration: BoxDecoration(
         color: Colors.orange[300],
         borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 4))
-        ],
+        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 4))],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Expanded(
-            child: Text("Go premium!\nGet unlimited access to all features",
-                style: TextStyle(color: Colors.white)),
+            child: Text('Go premium!\nGet unlimited access to all features', style: TextStyle(color: Colors.white)),
           ),
           ElevatedButton(
             onPressed: () {},
@@ -380,7 +335,7 @@ class _HomePageState extends State<HomePage> {
               foregroundColor: Colors.orange,
               shape: const StadiumBorder(),
             ),
-            child: const Text("Subscribe"),
+            child: const Text('Subscribe'),
           ),
         ],
       ),

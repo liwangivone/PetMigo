@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:frontend/services/url.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/chat_model.dart';
@@ -7,10 +8,9 @@ import '../models/message_model.dart';
 
 class ChatService {
   final String _base;
-  ChatService({String? baseUrl})
-      : _base = baseUrl ?? 'http://localhost:8080/api/chat';
+  ChatService({String? baseUrl}) : _base = baseUrl ?? kChatAPI; // ← ganti default
 
-  /// ───────────── chat room ─────────────
+  /* ───────────── chat room ───────────── */
   Future<ChatModel> createChatByIds(String userId, String vetId) async {
     final uri = Uri.parse('$_base/create?user_id=$userId&vet_id=$vetId');
     final res = await http.post(uri);
@@ -18,7 +18,7 @@ class ChatService {
     return ChatModel.fromJson(jsonDecode(res.body));
   }
 
-  /// ───────────── kirim pesan ─────────────
+  /* ───────────── kirim pesan ───────────── */
   Future<MessageModel> sendMessage(String chatId, MessageModel m) async {
     final uri = Uri.parse('$_base/send-message'
         '?chat_id=$chatId'
@@ -30,46 +30,34 @@ class ChatService {
     return MessageModel.fromJson(jsonDecode(res.body));
   }
 
-  /// ───────────── fetch (tipe lama) ─────────────
+  /* ───────────── fetch (tipe lama) ───────────── */
   Future<List<MessageModel>> fetchMessages(String chatId) async {
     final uri = Uri.parse('$_base/messages?chat_id=$chatId');
     final res = await http.get(uri, headers: {'Accept': 'application/json'});
     _check(res);
-
     final List data = jsonDecode(res.body) as List;
-    return data
-        .cast<Map<String, dynamic>>()
-        .map(MessageModel.fromJson)
-        .toList();
+    return data.cast<Map<String, dynamic>>().map(MessageModel.fromJson).toList();
   }
 
-  /// ───────────── fetch ALL (array murni) ─────────────
+  /* ───────────── fetch ALL (array murni) ───────────── */
   Future<List<MessageModel>> fetchMessagesAll(String chatId) async {
     final uri = Uri.parse('$_base/fetchmessagesall?chat_id=$chatId');
     final res = await http.get(uri, headers: {'Accept': 'application/json'});
     _check(res);
-
     final List data = jsonDecode(res.body) as List;
-    return data
-        .cast<Map<String, dynamic>>()
-        .map(MessageModel.fromJson)
-        .toList();
+    return data.cast<Map<String, dynamic>>().map(MessageModel.fromJson).toList();
   }
 
-  /// ───────────── daftar chat user ─────────────
+  /* ───────────── daftar chat user ───────────── */
   Future<List<ChatModel>> fetchChats(String userId) async {
     final uri = Uri.parse('$_base/chats?user_id=$userId');
     final res = await http.get(uri, headers: {'Accept': 'application/json'});
     _check(res);
-
     final List data = jsonDecode(res.body) as List;
-    return data
-        .cast<Map<String, dynamic>>()
-        .map(ChatModel.fromJson)
-        .toList();
+    return data.cast<Map<String, dynamic>>().map(ChatModel.fromJson).toList();
   }
 
-  /// internal
+  /* ───────────── internal ───────────── */
   void _check(http.Response res) {
     if (res.statusCode < 200 || res.statusCode >= 300) {
       throw HttpException('${res.statusCode} ${res.reasonPhrase}\n${res.body}',
