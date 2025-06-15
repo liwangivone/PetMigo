@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:frontend/models/user_model.dart';
 import 'package:frontend/models/expenses_model.dart';
 import 'package:frontend/models/vet_models.dart';
+import 'package:frontend/models/chatbot_models.dart';
 
 //BLoC
 import 'package:frontend/bloc/login_bloc.dart';
@@ -11,6 +12,9 @@ import 'package:frontend/bloc/regist_bloc.dart';
 import 'package:frontend/bloc/profile_bloc.dart';
 import 'dart:async';
 import 'package:frontend/bloc/vet_chat_bloc.dart';
+import 'package:frontend/bloc/chatbot_bloc/chatbot_bloc.dart';
+import 'package:frontend/bloc/chatbot_bloc/chatbot_event.dart';
+import 'package:frontend/bloc/chatbot_bloc/chatbot_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -25,10 +29,12 @@ import 'package:google_fonts/google_fonts.dart';
 
 //Services
 import 'package:frontend/services/user_service.dart';
+import 'package:frontend/services/chatbot_service.dart';
 
 //Repository
 import 'package:frontend/repository/auth_repository.dart';
 import 'package:frontend/repository/user_repository.dart';
+import 'package:frontend/repository/chatbot_repository.dart';
 
 //Shared Preferences (package resmi)
 import 'package:shared_preferences/shared_preferences.dart';

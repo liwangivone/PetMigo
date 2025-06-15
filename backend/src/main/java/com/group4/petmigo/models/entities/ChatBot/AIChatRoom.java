@@ -56,12 +56,19 @@ public class AIChatRoom {
     private Set<AIChat> aiChats;
 
     public LocalDateTime getLastChatDateTime() {
+        if (aiChats == null || aiChats.isEmpty()) {
+            return createdAt.atStartOfDay(); // Return creation time as LocalDateTime if no chats
+        }
         return aiChats.stream()
                 .map(AIChat::getCreatedAt)
-                .max(LocalDateTime::compareTo).get();
+                .max(LocalDateTime::compareTo)
+                .orElse(createdAt.atStartOfDay());
     }
 
     public AIChat getLastChat() {
+        if (aiChats == null || aiChats.isEmpty()) {
+            return null;
+        }
         List<AIChat> aiChatList = aiChats.stream()
                 .sorted(Comparator.comparing(AIChat::getCreatedAt))
                 .collect(Collectors.toList());

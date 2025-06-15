@@ -80,19 +80,28 @@ public class ChatBotService {    @Autowired
 
     public List<Map<String, Object>> getHistory(AIChatRoom chatRoom) {
         ArrayList<Map<String, Object>> history = new ArrayList<Map<String, Object>>();
+        
+        if (chatRoom == null || chatRoom.getAiChats() == null) {
+            return history;
+        }
+        
         List<AIChat> chatList = aiChatRepository.findAll().stream()
-                .filter(chat -> chat.getIdChatRoom().equals(chatRoom))
+                .filter(chat -> chat.getIdChatRoom() != null && chat.getIdChatRoom().getId().equals(chatRoom.getId()))
                 .sorted(Comparator.comparing(AIChat::getCreatedAt))
                 .collect(Collectors.toList());
-        Collections.reverse(chatList);
+        
         for (AIChat chat : chatList) {
             Map<String, Object> chatEntry = new HashMap<>();
-            chatEntry.put("role", chat.getIsBot() ? "assistant" : "user");
+            chatEntry.put("role", chat.getIsBot() ? "model" : "user");
             chatEntry.put("parts", List.of(Map.of("text", chat.getChat())));
+            chatEntry.put("timestamp", chat.getCreatedAt());
+            chatEntry.put("isBot", chat.getIsBot());
+            chatEntry.put("message", chat.getChat());
             history.add(chatEntry);
         }
-        List<Map<String, Object>> result = history;
-        return result;    }
+        
+        return history;
+    }
     
     public String sendPrompt(String prompt, AIChatRoom chatRoom) throws JsonProcessingException {
         aiChatRepository.save(new AIChat(
