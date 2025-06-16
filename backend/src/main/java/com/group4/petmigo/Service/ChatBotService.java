@@ -29,7 +29,7 @@ import java.util.Comparator;
 
 @Service
 public class ChatBotService {    
-        
+
     @Autowired
     private AIChatRepository aiChatRepository;
 
@@ -113,11 +113,8 @@ public class ChatBotService {
         
         for (AIChat chat : chatList) {
             Map<String, Object> chatEntry = new HashMap<>();
-            chatEntry.put("role", chat.getIsBot() ? "model" : "user");
+            chatEntry.put("role", chat.getIsBot() ? "assistant" : "user");
             chatEntry.put("parts", List.of(Map.of("text", chat.getChat())));
-            chatEntry.put("timestamp", chat.getCreatedAt());
-            chatEntry.put("isBot", chat.getIsBot());
-            chatEntry.put("message", chat.getChat());
             history.add(chatEntry);
         }
         
