@@ -34,3 +34,12 @@ class UpdateProfileImage extends UserEvent {
   List<Object?> get props => [imageUrl];
 }
 
+// Add this to your existing UserEvent class
+class PingUser extends UserEvent {
+  final String id;
+  
+  const PingUser(this.id);
+  
+  @override
+  List<Object?> get props => [id];
+}

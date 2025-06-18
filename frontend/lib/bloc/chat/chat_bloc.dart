@@ -8,9 +8,12 @@ import 'chat_state.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final ChatService svc;
+
   ChatBloc(this.svc) : super(ChatInitial()) {
     on<FetchAllChats>(_fetchAll);
     on<FetchAllMessages>(_fetchAllMessages);
+    on<FetchAllMessagesAll>(_fetchAllMessagesAll);
+    on<FetchChatsByRole>(_fetchByRole);
     on<CreateChatWithIds>(_createByIds);
     on<SendMessageEvent>(_sendMessage);
   }
@@ -25,12 +28,33 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     }
   }
 
+  Future<void> _fetchByRole(FetchChatsByRole e, Emitter<ChatState> emit) async {
+    emit(ChatLoading());
+    try {
+      final chats = await svc.getChatsBySender(e.role, e.id); // id: String
+      emit(ChatListLoaded(chats));
+    } catch (err) {
+      emit(ChatError(err.toString()));
+    }
+  }
+
   Future<void> _fetchAllMessages(FetchAllMessages e, Emitter<ChatState> emit) async {
     final firstLoad = state is! ChatLoaded;
     if (!e.silent || firstLoad) {
       emit(ChatLoading());
     }
 
+    try {
+      final msgs = await svc.fetchMessages(e.chatId);
+      msgs.sort((a, b) => a.sentDate.compareTo(b.sentDate));
+      emit(ChatLoaded(ChatModel.simple(id: e.chatId, messages: msgs)));
+    } catch (err) {
+      emit(ChatError(err.toString()));
+    }
+  }
+
+  Future<void> _fetchAllMessagesAll(FetchAllMessagesAll e, Emitter<ChatState> emit) async {
+    emit(ChatLoading());
     try {
       final msgs = await svc.fetchMessages(e.chatId);
       msgs.sort((a, b) => a.sentDate.compareTo(b.sentDate));

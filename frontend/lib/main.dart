@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/bloc/chat/chat_bloc.dart';
 import 'package:frontend/bloc/clinic/clinic_bloc.dart';
 import 'package:frontend/bloc/petschedule/pet_schedule_bloc.dart';
+import 'package:frontend/bloc/user/user_bloc.dart';
 import 'package:frontend/bloc/vet/vet_bloc.dart';
+import 'package:frontend/models/chat_model.dart';
 import 'package:frontend/models/pet_model.dart';
 import 'package:frontend/services/chat_service.dart';
 import 'package:frontend/services/clinic_service.dart';
@@ -13,18 +15,58 @@ import 'package:frontend/services/user_service.dart';
 import 'package:frontend/services/vet_service.dart';
 import 'package:frontend/views/pages/vet_chat_page.dart';
 import 'package:go_router/go_router.dart';
-
-import 'package:frontend/bloc/user/user_bloc.dart';
 import 'package:frontend/bloc/pet/pet_bloc.dart';
 import 'package:frontend/models/vet_model.dart';
 import 'package:frontend/views/pages/pages.dart';
+import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  late final UserBloc _userBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _userBloc = UserBloc(userService: UserService());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _userBloc.close();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+      // App is going to background or closed
+      _userBloc.stopPingTimer();
+    } else if (state == AppLifecycleState.resumed) {
+      // App is coming back to foreground
+      _checkAndRestartPing();
+    }
+  }
+
+  Future<void> _checkAndRestartPing() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userid');
+    if (userId != null && userId.isNotEmpty) {
+      _userBloc.startPingTimer(userId);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,15 +74,20 @@ class MyApp extends StatelessWidget {
       initialLocation: '/',
       routes: [
         GoRoute(path: '/', builder: (_, __) => const SplashScreen()),
+        GoRoute(path: '/vet/home', builder: (_, __) => const VetHomePage()),
         GoRoute(path: '/onboarding', builder: (_, __) => OnboardingScreen()),
         GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
         GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
+        GoRoute(path: '/vet/register', builder: (_, __) => const VetRegisterScreen()),
+        GoRoute(path: '/choose-login', builder: (_, __) => const ChooseRolePage()),
+        GoRoute(path: '/vet/login', builder: (_, __) => const VetLoginScreen()),
         GoRoute(path: '/choosepet', builder: (_, __) => const ChoosePetPage()),
         GoRoute(path: '/dashboard', builder: (_, __) => const HomePage()),
         GoRoute(path: '/profile', builder: (_, __) => const ProfilePage()),
         GoRoute(path: '/edit-profile', builder: (_, __) => const EditProfilePage()),
         GoRoute(path: '/askai', builder: (_, __) => const AskAIWelcome()),
         GoRoute(path: '/myexpenses', builder: (_, __) => const MyExpensesPage()),
+        GoRoute(path: '/add-petschedule', builder: (_, __) => const PetScheduleInputView()),
         GoRoute(path: '/need-vet', builder: (_, __) => VetListPage()),
         GoRoute(
           path: '/detail-vet',
@@ -73,19 +120,36 @@ class MyApp extends StatelessWidget {
           },
         ),
         GoRoute(
-          path: '/chat-vet',
+          path: '/chat',
           builder: (_, state) {
             final extra = state.extra;
-            if (extra == null ||
-                extra is! Map<String, dynamic> ||
-                extra['vet'] == null ||
-                extra['chat'] == null) {
-              Future.microtask(() => _.go('/need-vet'));
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
+
+            if (extra is Map<String, dynamic>) {
+              final vet = extra['vet'] as VetModel?;
+              final chat = extra['chat'] as ChatModel?;
+              final isVet = extra['isVet'] as bool? ?? false;
+
+              if (vet == null || chat == null) {
+                Future.microtask(() => isVet ? _.go('/vet/home') : _.go('/need-vet'));
+                return const Scaffold(body: Center(child: CircularProgressIndicator()));
+              }
+
+              return VetChatPage(vet: vet, chat: chat, isVet: isVet);
             }
-            return ChatPage(vet: extra['vet'], chat: extra['chat']);
+
+            if (extra is ChatModel) {
+              final vet = extra.vet;
+
+              if (vet == null) {
+                Future.microtask(() => _.go('/vet/home'));
+                return const Scaffold(body: Center(child: CircularProgressIndicator()));
+              }
+
+              return VetChatPage(vet: vet, chat: extra, isVet: true);
+            }
+
+            Future.microtask(() => _.go('/need-vet'));
+            return const Scaffold(body: Center(child: CircularProgressIndicator()));
           },
         ),
         GoRoute(path: '/vet-dashboard', builder: (_, __) => const VetDashboardPage()),
@@ -95,7 +159,7 @@ class MyApp extends StatelessWidget {
 
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => UserBloc(userService: UserService())),
+        BlocProvider(create: (_) => _userBloc),
         BlocProvider(create: (_) => PetBloc(PetService())),
         BlocProvider(create: (_) => PetScheduleBloc(PetScheduleService())),
         BlocProvider(create: (_) => VetBloc(VetService())),

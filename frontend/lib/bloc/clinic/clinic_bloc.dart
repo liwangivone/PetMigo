@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/services/clinic_service.dart';
-import 'package:frontend/models/clinic_model.dart';
 import 'clinic_event.dart';
 import 'clinic_state.dart';
 

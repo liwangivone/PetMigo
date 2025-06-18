@@ -10,11 +10,24 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String selectedType = 'All';
   bool showAllSchedules = false;
+  bool showAllChats = false;
+  String? userId;
 
   @override
   void initState() {
     super.initState();
     _loadData();
+    _getUserId();
+  }
+
+  Future<void> _getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userId = prefs.getString('userid');
+    });
+    if (userId != null) {
+      context.read<ChatBloc>().add(FetchChatsByRole('USER', userId!));
+    }
   }
 
   void _loadData() {
@@ -45,10 +58,15 @@ class _HomePageState extends State<HomePage> {
                     if (schedState is! PetScheduleLoaded) {
                       return const Center(child: CircularProgressIndicator());
                     }
-                    return _buildContent(
-                      userState.user,
-                      petState.pets,
-                      schedState.schedules,
+                    return BlocBuilder<ChatBloc, ChatState>(
+                      builder: (context, chatState) {
+                        return _buildContent(
+                          userState.user,
+                          petState.pets,
+                          schedState.schedules,
+                          chatState,
+                        );
+                      },
                     );
                   },
                 );
@@ -66,7 +84,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildContent(User user, List<Pet> pets, List<PetSchedule> schedules) {
+  Widget _buildContent(User user, List<Pet> pets, List<PetSchedule> schedules, ChatState chatState) {
     final filteredPets = selectedType.toLowerCase() == 'all'
         ? pets
         : pets.where((p) => p.type.toLowerCase() == selectedType.toLowerCase()).toList();
@@ -86,11 +104,11 @@ class _HomePageState extends State<HomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _header(user),
+        _buildHeader(user),
         const SizedBox(height: 20),
-        _premiumCard(),
+        _buildPremiumCard(),
         const SizedBox(height: 20),
-        _scheduleSection(
+        _buildScheduleSection(
           upcoming: upcoming,
           limitedApproaching: limitedApproaching,
           past: past,
@@ -98,43 +116,51 @@ class _HomePageState extends State<HomePage> {
           toggleShowAll: () => setState(() => showAllSchedules = !showAllSchedules),
         ),
         const SizedBox(height: 20),
+        _buildChatHistorySection(chatState),
+        const SizedBox(height: 20),
         const Text('My pets', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        Row(children: ['All', 'Cat', 'Dog'].map(_chip).toList()),
+        Row(
+          children: ['All', 'Cat', 'Dog'].map((label) => _buildChip(label)).toList(),
+        ),
         const SizedBox(height: 10),
         filteredPets.isEmpty
             ? const Padding(
                 padding: EdgeInsets.all(12),
                 child: Text('Kamu belum punya hewan peliharaan.', style: TextStyle(color: Colors.grey)),
               )
-            : Column(children: filteredPets.map(_petCard).toList()),
+            : Column(
+                children: filteredPets.map((pet) => _buildPetCard(pet)).toList(),
+              ),
       ],
     );
   }
 
-  Widget _header(User user) => Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Hello, ${user.name}!', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                Text('Your pets miss you, check it now', style: TextStyle(color: Colors.grey[600])),
-              ],
-            ),
+  Widget _buildHeader(User user) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Hello, ${user.name}!', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              Text('Your pets miss you, check it now', style: TextStyle(color: Colors.grey[600])),
+            ],
           ),
-          GestureDetector(
-            onTap: () => context.go('/profile'),
-            child: CircleAvatar(
-              radius: 26,
-              backgroundColor: Colors.pink[100],
-              backgroundImage: user.profileImageUrl != null ? NetworkImage(user.profileImageUrl!) : null,
-              child: user.profileImageUrl == null ? Icon(Icons.person, color: Colors.red[900]) : null,
-            ),
+        ),
+        GestureDetector(
+          onTap: () => context.go('/profile'),
+          child: CircleAvatar(
+            radius: 26,
+            backgroundColor: Colors.pink[100],
+            backgroundImage: user.profileImageUrl != null ? NetworkImage(user.profileImageUrl!) : null,
+            child: user.profileImageUrl == null ? Icon(Icons.person, color: Colors.red[900]) : null,
           ),
-        ],
-      );
+        ),
+      ],
+    );
+  }
 
-  Widget _chip(String label) {
+  Widget _buildChip(String label) {
     final isSelected = selectedType.toLowerCase() == label.toLowerCase();
     return Padding(
       padding: const EdgeInsets.only(right: 8),
@@ -147,52 +173,53 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _scheduleSection({
+  Widget _buildScheduleSection({
     required List<PetSchedule> upcoming,
     required List<PetSchedule> limitedApproaching,
     required List<PetSchedule> past,
     required bool showAll,
     required VoidCallback toggleShowAll,
-  }) =>
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Upcoming Schedules', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              GestureDetector(
-                onTap: toggleShowAll,
-                child: Text(
-                  showAll ? 'Show limited' : 'View all',
-                  style: const TextStyle(fontSize: 14, color: Colors.blue, fontWeight: FontWeight.w500),
-                ),
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Upcoming Schedules', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            GestureDetector(
+              onTap: toggleShowAll,
+              child: Text(
+                showAll ? 'Show limited' : 'View all',
+                style: const TextStyle(fontSize: 14, color: Colors.blue, fontWeight: FontWeight.w500),
               ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          if (showAll) ...[
-            const Text('Upcoming schedules', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
-            const SizedBox(height: 6),
-            upcoming.isEmpty
-                ? const Text('No upcoming schedules.')
-                : Column(children: upcoming.map(_scheduleCard).toList()),
-            const SizedBox(height: 16),
-            const Text('Past schedules', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-            const SizedBox(height: 6),
-            past.isEmpty ? const Text('No past schedules.') : Column(children: past.map(_scheduleCard).toList()),
-          ] else ...[
-            if (upcoming.isEmpty)
-              const Text('No upcoming schedules.')
-            else if (limitedApproaching.isEmpty)
-              const Text('No upcoming schedules in 3 days.')
-            else
-              Column(children: limitedApproaching.map(_scheduleCard).toList()),
+            ),
           ],
+        ),
+        const SizedBox(height: 10),
+        if (showAll) ...[
+          const Text('Upcoming schedules', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+          const SizedBox(height: 6),
+          upcoming.isEmpty
+              ? const Text('No upcoming schedules.')
+              : Column(children: upcoming.map(_buildScheduleCard).toList()),
+          const SizedBox(height: 16),
+          const Text('Past schedules', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+          const SizedBox(height: 6),
+          past.isEmpty ? const Text('No past schedules.') : Column(children: past.map(_buildScheduleCard).toList()),
+        ] else ...[
+          if (upcoming.isEmpty)
+            const Text('No upcoming schedules.')
+          else if (limitedApproaching.isEmpty)
+            const Text('No upcoming schedules in 3 days.')
+          else
+            Column(children: limitedApproaching.map(_buildScheduleCard).toList()),
         ],
-      );
+      ],
+    );
+  }
 
-  Widget _scheduleCard(PetSchedule schedule) {
+  Widget _buildScheduleCard(PetSchedule schedule) {
     IconData icon;
     Color color;
     final label = _capitalize(schedule.category.name);
@@ -229,6 +256,124 @@ class _HomePageState extends State<HomePage> {
         leading: CircleAvatar(backgroundColor: color.withOpacity(0.2), child: Icon(icon, color: color)),
         title: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text(_formatScheduleDate(schedule)),
+      ),
+    );
+  }
+
+  Widget _buildPetCard(Pet pet) {
+    final isFemale = pet.gender.toLowerCase() == 'female';
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ListTile(
+        onTap: () => context.go('/pet-detail', extra: pet),
+        leading: CircleAvatar(
+          radius: 26,
+          backgroundImage: AssetImage(pet.type.toLowerCase() == 'cat'
+              ? 'assets/images/cat.png'
+              : 'assets/images/dog.png'),
+        ),
+        title: Text(pet.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(pet.breed ?? '-'),
+            Row(
+              children: [
+                Icon(isFemale ? Icons.female : Icons.male, size: 14, color: isFemale ? Colors.pink : Colors.blue),
+                const SizedBox(width: 4),
+                Text(pet.gender),
+                const SizedBox(width: 10),
+                const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
+                const SizedBox(width: 4),
+                Text(_calculateAge(pet.birthdate)),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChatHistorySection(ChatState chatState) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Chat History', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            GestureDetector(
+              onTap: () => setState(() => showAllChats = !showAllChats),
+              child: Text(
+                showAllChats ? 'Show less' : 'View all',
+                style: const TextStyle(fontSize: 14, color: Colors.blue, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        if (chatState is ChatListLoaded) 
+          _buildChatList(chatState.chats)
+        else if (chatState is ChatError)
+          Text('Error loading chats: ${chatState.message}', style: TextStyle(color: Colors.red))
+        else
+          const Center(child: CircularProgressIndicator()),
+      ],
+    );
+  }
+
+  Widget _buildChatList(List<ChatModel> chats) {
+    final sortedChats = List<ChatModel>.from(chats)
+      ..sort((a, b) {
+        if (a.messages.isEmpty && b.messages.isEmpty) return 0;
+        if (a.messages.isEmpty) return 1;
+        if (b.messages.isEmpty) return -1;
+        return b.messages.last.sentDate.compareTo(a.messages.last.sentDate);
+      });
+
+    if (sortedChats.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(12),
+        child: Text('No chat history available.', style: TextStyle(color: Colors.grey)),
+      );
+    }
+
+    final displayedChats = showAllChats ? sortedChats : sortedChats.take(2).toList();
+
+    return Column(
+      children: displayedChats.map((chat) => _buildChatCard(chat)).toList(),
+    );
+  }
+
+  Widget _buildChatCard(ChatModel chat) {
+    final lastMessage = chat.messages.isNotEmpty 
+        ? chat.messages.last 
+        : null;
+    final lastMessageText = lastMessage?.messagetext ?? 'No messages yet';
+    final lastMessageTime = lastMessage?.sentDate ?? DateTime.now();
+    final vetName = chat.vet?.name ?? 'Vet';
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ListTile(
+        onTap: () => context.go('/chat', extra: {
+          'chat': chat,
+          'vet': chat.vet,
+        }),
+        leading: CircleAvatar(
+          radius: 26,
+          backgroundColor: Colors.grey[200],
+          child: Icon(
+            Icons.medical_services,
+            color: Colors.grey[600],
+          ),
+        ),
+        title: Text(vetName, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(lastMessageText, maxLines: 1, overflow: TextOverflow.ellipsis),
+        trailing: Text(
+          _formatChatTime(lastMessageTime),
+          style: const TextStyle(fontSize: 12, color: Colors.grey),
+        ),
       ),
     );
   }
@@ -271,38 +416,21 @@ class _HomePageState extends State<HomePage> {
     return '${diff.inMinutes} ${diff.inMinutes == 1 ? 'minute' : 'minutes'} ago - ${s.petName}';
   }
 
-  Widget _petCard(Pet pet) {
-    final isFemale = pet.gender.toLowerCase() == 'female';
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        onTap: () => context.go('/pet-detail', extra: pet),
-        leading: CircleAvatar(
-          radius: 26,
-          backgroundImage: AssetImage(pet.type.toLowerCase() == 'cat'
-              ? 'assets/images/cat.png'
-              : 'assets/images/dog.png'),
-        ),
-        title: Text(pet.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(pet.breed ?? '-'),
-            Row(
-              children: [
-                Icon(isFemale ? Icons.female : Icons.male, size: 14, color: isFemale ? Colors.pink : Colors.blue),
-                const SizedBox(width: 4),
-                Text(pet.gender),
-                const SizedBox(width: 10),
-                const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
-                const SizedBox(width: 4),
-                Text(_calculateAge(pet.birthdate)),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+  String _formatChatTime(DateTime time) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final messageDate = DateTime(time.year, time.month, time.day);
+    final diffDays = today.difference(messageDate).inDays;
+
+    if (diffDays == 0) {
+      return DateFormat('h:mm a').format(time);
+    } else if (diffDays == 1) {
+      return 'Yesterday';
+    } else if (diffDays < 7) {
+      return DateFormat('EEEE').format(time);
+    } else {
+      return DateFormat('MMM d').format(time);
+    }
   }
 
   String _calculateAge(DateTime birthdate) {
@@ -314,7 +442,7 @@ class _HomePageState extends State<HomePage> {
     return '$age years';
   }
 
-  Widget _premiumCard() {
+  Widget _buildPremiumCard() {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

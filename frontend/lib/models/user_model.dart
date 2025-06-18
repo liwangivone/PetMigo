@@ -53,4 +53,17 @@ class User {
       isPremium: isPremium ?? this.isPremium,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userid': id,
+      'uid': uid,
+      'name': name,
+      'email': email,
+      'phonenumber': phone,
+      'password': password,
+      'profileImageUrl': profileImageUrl,
+      'isPremium': isPremium,
+    };
+  }
 }

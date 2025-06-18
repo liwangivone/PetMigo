@@ -36,7 +36,7 @@ class OnboardingScreen extends StatelessWidget {
       );
       context.read<OnboardingBloc>().add(OnboardingNextPressed());
     } else {
-      context.go('/login');
+      context.go('/choose-login');
     }
   }
 
