@@ -1,12 +1,12 @@
 package com.group4.petmigo.Service;
 
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.group4.petmigo.DTO.UserDTO;
@@ -17,12 +17,10 @@ import com.group4.petmigo.models.entities.User.status;
 @Service
 public class UserService {
 
+    
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
+    
     public UserDTO register(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new RuntimeException("Email sudah digunakan.");
@@ -36,8 +34,6 @@ public class UserService {
             throw new RuntimeException("Password tidak boleh kosong.");
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword())); // ✅ HASH
-
         user.setStatus(status.offline);
         user.setUid(generateUid());
         user.setCreatedAt(LocalDateTime.now());
@@ -48,15 +44,17 @@ public class UserService {
         return toDTO(saved);
     }
 
+
     public UserDTO Login(String email, String password){
         User user = userRepository.findByEmail(email);
-        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
+        if (user != null && user.getPassword().equals(password)) {
             return toDTO(user);
         }
 
         throw new RuntimeException("email atau password salah");
     }
 
+  // Map menyimpan last ping time tiap user yang online
     private final ConcurrentHashMap<Long, LocalDateTime> onlineUsers = new ConcurrentHashMap<>();
 
     public boolean pingUser(Long id) {
@@ -79,7 +77,7 @@ public class UserService {
         if (userOpt.isEmpty()) return false;
 
         User user = userOpt.get();
-        if (user.getStatus() != status.offline) {
+        if(user.getStatus() != status.offline){
             user.setStatus(status.offline);
             userRepository.save(user);
         }
@@ -94,32 +92,29 @@ public class UserService {
     }
 
     public UserDTO updateProfile(Long id, User updatedData) {
-        User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User tidak ditemukan."));
+    User user = userRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("User tidak ditemukan."));
 
-        if (!user.getEmail().equals(updatedData.getEmail())
-                && userRepository.existsByEmail(updatedData.getEmail())) {
-            throw new RuntimeException("Email sudah digunakan.");
-        }
-
-        if (!user.getName().equals(updatedData.getName())
-                && userRepository.existsByName(updatedData.getName())) {
-            throw new RuntimeException("Username sudah digunakan.");
-        }
-
-        user.setName(updatedData.getName());
-        user.setEmail(updatedData.getEmail());
-        user.setPhonenumber(updatedData.getPhonenumber());
-
-        if (updatedData.getPassword() != null && !updatedData.getPassword().isBlank()) {
-            user.setPassword(passwordEncoder.encode(updatedData.getPassword())); // ✅ HASH jika update
-        }
-
-        user.setUpdateAt(LocalDateTime.now());
-
-        return toDTO(userRepository.save(user));
+    if (!user.getEmail().equals(updatedData.getEmail())
+            && userRepository.existsByEmail(updatedData.getEmail())) {
+        throw new RuntimeException("Email sudah digunakan.");
     }
 
+    if (!user.getName().equals(updatedData.getName())
+            && userRepository.existsByName(updatedData.getName())) {
+        throw new RuntimeException("Username sudah digunakan.");
+    }
+
+    user.setName(updatedData.getName());
+    user.setEmail(updatedData.getEmail());
+    user.setPhonenumber(updatedData.getPhonenumber());
+    user.setPassword(updatedData.getPassword()); // opsional, bisa dicek null
+    user.setUpdateAt(LocalDateTime.now());
+
+    return toDTO(userRepository.save(user));
+    }
+
+    // Method untuk dapatkan User lengkap beserta pets berdasarkan ID
     public User getUserProfileById(Long userId) {
         Optional<User> userOpt = userRepository.findByUserid(userId);
         if (userOpt.isEmpty()) {
@@ -128,7 +123,11 @@ public class UserService {
         return userOpt.get();
     }
 
-    @Scheduled(fixedRate = 10000)
+
+
+    // ini otomatis online offline
+
+    @Scheduled(fixedRate = 10000) // tiap 5 detik cek semua user yang online
     public void checkOfflineUsers() {
         LocalDateTime now = LocalDateTime.now();
 
@@ -136,8 +135,9 @@ public class UserService {
             Long userId = entry.getKey();
             LocalDateTime lastPing = entry.getValue();
 
+            // Jika sudah lebih dari 10 detik tidak ping
             if (lastPing.plusSeconds(10).isBefore(now)) {
-                manualSetOffline(userId);
+                manualSetOffline(userId); // otomatis set offline user
             }
         }
     }
@@ -153,11 +153,11 @@ public class UserService {
     }
 
     private String generateUid() {
-        List<User> latestUsers = userRepository.findTopByOrderByUidDesc();
-        if (latestUsers.isEmpty()) {
-            return "00000000";
-        }
-        Long lastId = latestUsers.get(0).getUserid();
-        return String.format("%08d", lastId + 1);
+    List<User> latestUsers = userRepository.findTopByOrderByUidDesc();
+    if (latestUsers.isEmpty()) {
+        return "00000000";
+    }
+    Long lastId = latestUsers.get(0).getUserid(); // ambil id terakahir
+    return String.format("%08d", lastId + 1); // format ke 8 digit
     }
 }
