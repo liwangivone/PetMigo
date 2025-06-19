@@ -29,7 +29,7 @@ import java.util.Comparator;
 
 @Service
 public class ChatBotService {    
-        
+
     @Autowired
     private AIChatRepository aiChatRepository;
 
