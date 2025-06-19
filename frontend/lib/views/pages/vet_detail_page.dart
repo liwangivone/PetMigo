@@ -13,7 +13,7 @@ class VetDetailPage extends StatelessWidget {
 
   Future<void> _startChat(BuildContext ctx) async {
     final prefs = await SharedPreferences.getInstance();
-    final userid = prefs.getString('userid'); // konsisten dengan login
+    final userid = prefs.getString('userid');
     if (userid == null) {
       ScaffoldMessenger.of(ctx).showSnackBar(
         const SnackBar(content: Text('User belum login')),
@@ -21,7 +21,7 @@ class VetDetailPage extends StatelessWidget {
       return;
     }
 
-    final vetid = vet.id; // pastikan ini benar-benar field ID
+    final vetid = vet.id;
     ctx.read<ChatBloc>().add(CreateChatWithIds(userId: userid, vetId: vetid));
   }
 
@@ -33,7 +33,7 @@ class VetDetailPage extends StatelessWidget {
     return BlocListener<ChatBloc, ChatState>(
       listener: (ctx, state) {
         if (state is ChatLoaded) {
-          ctx.go('/chat-vet', extra: {
+          ctx.go('/chat', extra: {
             'vet': vet,
             'chat': state.chat,
           });

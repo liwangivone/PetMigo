@@ -41,7 +41,7 @@ class PetBloc extends Bloc<PetEvent, PetState> {
 
       final p = event.pet;
 
-      if (p.name.trim().isEmpty || p.gender.trim().isEmpty || p.birthdate == null) {
+      if (p.name.trim().isEmpty || p.gender.trim().isEmpty) {
         emit(const PetError('Data pet belum lengkap'));
         return;
       }
@@ -91,7 +91,7 @@ class PetBloc extends Bloc<PetEvent, PetState> {
     try {
       final pet = event.pet;
 
-      if (pet.name.trim().isEmpty || pet.gender.trim().isEmpty || pet.birthdate == null) {
+      if (pet.name.trim().isEmpty || pet.gender.trim().isEmpty) {
         emit(const PetError('Data pet belum lengkap'));
         return;
       }
@@ -114,7 +114,7 @@ class PetBloc extends Bloc<PetEvent, PetState> {
         petSchedules: pet.petSchedules,
       );
 
-      final response = await petService.updatePet(pet.id!, updatedPet);
+      final response = await petService.updatePet(pet.id, updatedPet);
 
       emit(PetUpdated(Pet.fromJson(response)));
       emit(const PetSuccess('Pet berhasil diperbarui'));

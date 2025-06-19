@@ -73,7 +73,7 @@ class _PetEditPageState extends State<PetEditPage> {
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             onPressed: () {
               Navigator.pop(context); // close dialog
-              context.read<PetBloc>().add(DeletePet(widget.pet.id!));
+              context.read<PetBloc>().add(DeletePet(widget.pet.id));
             },
             child: const Text('Delete'),
           ),

@@ -76,4 +76,17 @@ class UserService {
     // Simulasi: ganti jika sudah punya endpoint asli
     return getUserProfile(userId);
   }
+
+   // ========= PING =========
+  Future<String> pingUser(String id) async {
+  final res = await http.get(Uri.parse('$baseUrl/ping/$id'));
+  
+  if (res.statusCode == 200) {
+    return "ONLINE";
+  } else if (res.statusCode == 404) {
+    return "Not Found";
+  }
+  throw Exception('Ping gagal (${res.statusCode})');
+}
+
 }

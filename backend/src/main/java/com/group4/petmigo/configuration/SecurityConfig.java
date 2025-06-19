@@ -4,13 +4,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
-import java.util.Arrays;
+import java.util.List;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -19,28 +20,28 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(Customizer.withDefaults()) // ⬅️ Enable CORS
-            .csrf(csrf -> csrf.disable()) // ⬅️ Disable CSRF (biar gak ganggu request POST/PUT/DELETE dari luar)
+            .cors(withDefaults()) // ✅ Aktifkan CORS
+            .csrf(csrf -> csrf.disable()) // ✅ Matikan CSRF
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/users/register", "/api/users/login").permitAll() // ⬅️ Login & register bebas
-                .anyRequest().permitAll() // ⬅️ Semua request diizinkan (gak perlu login)
-            )
-            .formLogin(Customizer.withDefaults());
+                .requestMatchers("/api/users/register", "/api/users/login").permitAll() // ✅ Bebas akses
+                .anyRequest().permitAll() // ✅ Semua endpoint diizinkan
+            );
 
         return http.build();
     }
 
     @Bean
-    public CorsFilter corsFilter() {
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.setAllowedOriginPatterns(Arrays.asList("*")); // ⬅️ Izinkan semua origin (fix CORS error)
-        config.setAllowedHeaders(Arrays.asList("*"));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        config.setAllowedOriginPatterns(List.of("*")); // ✅ Izinkan semua origin (Flutter Web, APK, DevTunnel)
+        config.setAllowedHeaders(List.of("*")); // ✅ Semua header
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // ✅ Semua method
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config); // ⬅️ Berlaku untuk semua endpoint
+        source.registerCorsConfiguration("/**", config);
 
-        return new CorsFilter(source);
-    }
+        return source;
+    }   
 }
+    

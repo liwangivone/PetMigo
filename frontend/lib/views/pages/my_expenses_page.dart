@@ -43,10 +43,8 @@ class _MyExpensesPageState extends State<MyExpensesPage> {
 
             final filteredExpenses = selectedFilter == "All"
                 ? expenses
-                : expenses
-                    .where((e) =>
-                        e.petType.toUpperCase() == selectedFilter.toUpperCase())
-                    .toList();
+                : expenses.where((e) =>
+                    e.petType.toUpperCase() == selectedFilter.toUpperCase()).toList();
 
             final total = filteredExpenses.fold<int>(0, (sum, e) => sum + e.expense);
 
@@ -82,8 +80,7 @@ class _MyExpensesPageState extends State<MyExpensesPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text("My Expenses",
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
                   Row(
                     children: [
@@ -111,7 +108,9 @@ class _MyExpensesPageState extends State<MyExpensesPage> {
                                     fontSize: 20, fontWeight: FontWeight.bold)),
                             const Spacer(),
                             FloatingActionButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                context.go('/add-petschedule');
+                              },
                               backgroundColor: Colors.blue,
                               mini: true,
                               child: const Icon(Icons.add),
@@ -126,8 +125,7 @@ class _MyExpensesPageState extends State<MyExpensesPage> {
                               dataMap: filteredDataMap,
                               colorList: colorList,
                               chartType: ChartType.disc,
-                              legendOptions:
-                                  const LegendOptions(showLegends: true),
+                              legendOptions: const LegendOptions(showLegends: true),
                               chartValuesOptions:
                                   const ChartValuesOptions(showChartValues: false),
                             ),
@@ -149,12 +147,10 @@ class _MyExpensesPageState extends State<MyExpensesPage> {
                             Padding(
                               padding: const EdgeInsets.only(top: 16, bottom: 8),
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(_formatDate(date),
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold)),
+                                      style: const TextStyle(fontWeight: FontWeight.bold)),
                                   const Text("View all",
                                       style: TextStyle(color: Colors.blue)),
                                 ],
@@ -233,7 +229,8 @@ class _MyExpensesPageState extends State<MyExpensesPage> {
           child: Icon(icon, color: color),
         ),
         title: Text(e.description),
-        subtitle: Text("Rp ${e.expense} - ${e.petName}\n${DateFormat.Hm().format(e.date)}"),
+        subtitle: Text(
+            "Rp ${e.expense} - ${e.petName}\n${DateFormat.Hm().format(e.date)}"),
         isThreeLine: true,
       ),
     );

@@ -19,4 +19,7 @@ class UserRepository {
     final json = await userService.updateProfileImage(userId, imageUrl);
     return User.fromJson(json);
   }
+  Future<String> pingUser(String id) async {
+  return await userService.pingUser(id);
+  }
 }

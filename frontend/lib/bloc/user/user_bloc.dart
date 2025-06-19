@@ -1,6 +1,6 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../models/user_model.dart';
 import '../../services/user_service.dart';
 import 'user_event.dart';
@@ -8,6 +8,7 @@ import 'user_state.dart';
 
 class UserBloc extends Bloc<UserEvent, UserState> {
   final UserService userService;
+  Timer? _pingTimer;
 
   UserBloc({required this.userService}) : super(const UserInitial()) {
     on<GetUserData>((event, emit) async {
@@ -22,6 +23,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
         final userData = await userService.getUserProfile(userId);
         final user = User.fromJson(userData);
         emit(UserLoaded(user));
+        startPingTimer(userId); // Start timer after successful login
       } catch (e) {
         emit(const UserError("Failed to load user data"));
       }
@@ -58,9 +60,47 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     });
 
     on<LogoutUser>((event, emit) async {
+      stopPingTimer(); // Stop timer on logout
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
       emit(const UserLoggedOut());
     });
+
+    on<PingUser>((event, emit) async {
+      try {
+        final status = await userService.pingUser(event.id);
+        emit(UserPingResult(status));
+      } catch (e) {
+        emit(UserError("Ping failed: ${e.toString()}"));
+      } finally {
+        // Return to loaded state if needed
+        if (state is! UserError) {
+          final prefs = await SharedPreferences.getInstance();
+          final userId = prefs.getString('userid');
+          if (userId != null) {
+            final userData = await userService.getUserProfile(userId);
+            emit(UserLoaded(User.fromJson(userData)));
+          }
+        }
+      }
+    });
+  }
+
+  void startPingTimer(String userId) {
+    stopPingTimer(); // Cancel any existing timer
+    _pingTimer = Timer.periodic(const Duration(seconds: 9), (timer) {
+      add(PingUser(userId));
+    });
+  }
+
+  void stopPingTimer() {
+    _pingTimer?.cancel();
+    _pingTimer = null;
+  }
+
+  @override
+  Future<void> close() {
+    stopPingTimer(); // Clean up timer when bloc is closed
+    return super.close();
   }
 }

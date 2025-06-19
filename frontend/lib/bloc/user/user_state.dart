@@ -49,3 +49,13 @@ class UserError extends UserState {
 class UserLoggedOut extends UserState {
   const UserLoggedOut();
 }
+
+// Add this to your existing UserState classes
+class UserPingResult extends UserState {
+  final String status;
+  
+  const UserPingResult(this.status);
+  
+  @override
+  List<Object?> get props => [status];
+}

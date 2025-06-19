@@ -7,14 +7,13 @@ class FetchAllChats extends ChatEvent {
   FetchAllChats(this.userId);
 }
 
-/// ── tambahkan [silent] (default =`false`) ──
 class FetchAllMessages extends ChatEvent {
   final String chatId;
   final bool silent;
   FetchAllMessages(this.chatId, {this.silent = false});
 }
 
-class FetchAllMessagesAll extends ChatEvent {   // tetap ada
+class FetchAllMessagesAll extends ChatEvent {
   final String chatId;
   FetchAllMessagesAll(this.chatId);
 }
@@ -29,4 +28,10 @@ class SendMessageEvent extends ChatEvent {
   final String chatId;
   final MessageModel message;
   SendMessageEvent(this.chatId, this.message);
+}
+
+class FetchChatsByRole extends ChatEvent {
+  final String role;
+  final String id;
+  FetchChatsByRole(this.role, this.id);
 }

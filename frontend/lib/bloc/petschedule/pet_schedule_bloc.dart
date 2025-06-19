@@ -11,6 +11,7 @@ class PetScheduleBloc extends Bloc<PetScheduleEvent, PetScheduleState> {
   PetScheduleBloc(this.petScheduleService) : super(PetScheduleInitial()) {
     on<LoadPetSchedules>(_onLoadPetSchedules);
     on<LoadPetSchedulesByPetId>(_onLoadPetSchedulesByPetId);
+    on<CreatePetSchedule>(_onCreatePetSchedule);
   }
 
   Future<void> _onLoadPetSchedules(
@@ -109,6 +110,41 @@ class PetScheduleBloc extends Bloc<PetScheduleEvent, PetScheduleState> {
       emit(PetScheduleLoaded(parsed));
     } catch (e, st) {
       print("Error in PetScheduleBloc (byPetId): $e\n$st");
+      emit(PetScheduleError(e.toString()));
+    }
+  }
+
+  Future<void> _onCreatePetSchedule(
+    CreatePetSchedule event,
+    Emitter<PetScheduleState> emit,
+  ) async {
+    emit(PetScheduleLoading());
+    try {
+      final response = await petScheduleService.createSchedule(
+        event.petId,
+        event.schedule,
+      );
+      
+      final createdSchedule = PetSchedule(
+        id: response['schedule_id'].toString(),
+        category: event.schedule.category,
+        expense: event.schedule.expense,
+        description: event.schedule.description,
+        date: event.schedule.date,
+        petId: event.petId,
+        petName: event.schedule.petName,
+        petType: event.schedule.petType,
+      );
+
+      if (state is PetScheduleLoaded) {
+        final currentState = state as PetScheduleLoaded;
+        emit(PetScheduleLoaded([...currentState.schedules, createdSchedule]));
+      } else {
+        emit(PetScheduleCreated(createdSchedule));
+      }
+    } catch (e, stackTrace) {
+      print("Error creating pet schedule: $e");
+      print("Stack trace: $stackTrace");
       emit(PetScheduleError(e.toString()));
     }
   }

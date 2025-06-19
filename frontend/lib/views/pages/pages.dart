@@ -85,3 +85,8 @@ part 'vet_dashboard_page.dart';
 part 'vet_chat_list_page.dart';
 part 'pet_detail_page.dart';
 part 'edit_pet_form.dart';
+part 'vet_login_page.dart';
+part 'vet_register_page.dart';
+part 'choose_login.dart';
+part 'vet_home_page.dart';
+part 'add_petschedule_pet.dart';

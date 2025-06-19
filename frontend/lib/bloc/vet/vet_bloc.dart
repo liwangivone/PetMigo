@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Tambahkan ini
 import '../../services/vet_service.dart';
 import 'vet_event.dart';
 import 'vet_state.dart';
@@ -12,6 +13,11 @@ class VetBloc extends Bloc<VetEvent, VetState> {
       emit(const VetLoading());
       try {
         final vet = await vetService.login(event.email, event.password);
+        
+        // Simpan vetId ke local storage
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('vetid', vet.id); // asumsi vet.id adalah String
+
         emit(VetAuthSuccess(vet));
       } catch (e) {
         emit(VetError(e.toString()));
@@ -31,6 +37,7 @@ class VetBloc extends Bloc<VetEvent, VetState> {
           overview: event.overview,
           schedule: event.schedule,
         );
+
         emit(VetAuthSuccess(vet));
       } catch (e) {
         emit(VetError(e.toString()));

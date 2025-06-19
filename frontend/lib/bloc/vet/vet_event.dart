@@ -7,17 +7,19 @@ abstract class VetEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// 🔐 Login dengan email & password.
+/// 🔐 Login dengan email & password.
 class VetLoginRequested extends VetEvent {
   final String email;
   final String password;
-  const VetLoginRequested(this.email, this.password);
+
+  // ✅ Named parameters for compatibility with UI
+  const VetLoginRequested({required this.email, required this.password});
 
   @override
   List<Object?> get props => [email, password];
 }
 
-/// 📝 Registrasi akun dokter hewan baru.
+/// 📝 Registrasi akun dokter hewan baru.
 class VetRegisterRequested extends VetEvent {
   final String name;
   final String email;
@@ -49,7 +51,7 @@ class VetRegisterRequested extends VetEvent {
       ];
 }
 
-/// 📥 Ambil seluruh daftar dokter hewan.
+/// 📥 Ambil seluruh daftar dokter hewan.
 class FetchAllVets extends VetEvent {
   const FetchAllVets();
 }
