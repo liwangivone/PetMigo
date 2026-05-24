@@ -1,4 +1,6 @@
-# 🐾 PetMigo
+<p align="center">
+  <img src="frontend/assets/images/petmigo_logo.png" alt="PetMigo Logo" width="200"/>
+</p>
 
 PetMigo adalah aplikasi manajemen dan perawatan hewan peliharaan komprehensif yang membantu pemilik pet untuk melacak jadwal peliharaan mereka, berkonsultasi dengan dokter hewan (vet), menemukan klinik terbaik, dan berkomunikasi melalui fitur chat.
 
